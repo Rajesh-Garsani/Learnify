@@ -15,6 +15,8 @@ import Login from './pages/Login';
 import Profile from "./pages/Profile";
 import AIChatbot from './components/AIChatbot';
 import SearchPage from './components/SearchPage';
+import Courses from './pages/Courses';
+
 
 // BUG 5 FIX: Added a ProtectedRoute wrapper to stop sudden logouts on browser refresh
 const ProtectedRoute = ({ children }) => {
@@ -42,6 +44,9 @@ function App() {
             <Route path="/subcategory/:subcategoryId" element={<SubCategoryPage />} />
             <Route path="/category/:categoryId" element={<SubCategoryPage />} />
             <Route path="/search" element={<SearchPage />} />
+            {/* 2. Add this exact route */}
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/course/:id" element={<CourseDetail />} />
 
             {/* Protected Routes */}
             <Route path="/profile" element={

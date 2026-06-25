@@ -118,47 +118,7 @@ function SearchPage() {
 
   return (
     <Container className="search-page py-5">
-      <div className="search-header mb-5">
-        <h1 className="mb-4">Search LearnAI</h1>
-        <Form onSubmit={handleSearch} className="mb-4">
-          <InputGroup className="search-page-input-group">
-            <Form.Control
-              id="main-search-input"
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="What do you want to learn today?"
-              aria-label="Search"
-              className="search-page-input"
-            />
-            <Button
-              variant="primary"
-              type="submit"
-              className="search-page-button"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Searching...
-                </>
-              ) : (
-                <>
-                  <i className="bi bi-search me-2"></i>
-                  Search
-                </>
-              )}
-            </Button>
-          </InputGroup>
-        </Form>
-        <div className="quick-tips">
-          <small className="text-muted">
-            <i className="bi bi-lightbulb me-1"></i>
-            Press <kbd>Q</kbd> from anywhere to focus search
-          </small>
-        </div>
-      </div>
+
 
       <div className="search-filters mb-4">
         <div className="d-flex flex-wrap gap-2">
