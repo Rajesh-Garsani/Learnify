@@ -62,7 +62,7 @@ function Home() {
         <h1 className="display-4 fw-bold mb-3 text-animate" style={{ color: 'var(--brand-primary)' }}>
           Learn To Code
         </h1>
-        <p className="lead text-muted">Build What You Think!</p>
+
       </div>
 
       {/* Carousel */}
