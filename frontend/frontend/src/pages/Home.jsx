@@ -121,7 +121,7 @@ function Home() {
                   {course.thumbnail ? (
                     <Card.Img
                       variant="top"
-                      src={course.thumbnail.startsWith('http') ? course.thumbnail : `${API_BASE_URL}${course.thumbnail}`}
+                      src={course.thumbnail.startsWith('http') ? course.thumbnail : `http://127.0.0.1:8000${course.thumbnail}`}
                       style={{ height: '160px', objectFit: 'cover' }}
                       alt={course.title}
                     />
