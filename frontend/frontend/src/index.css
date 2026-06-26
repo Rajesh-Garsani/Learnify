@@ -1,12 +1,12 @@
+/* ===== Google Font ===== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Modern Professional Teal/Emerald Palette */
-  --brand-primary: #0d9488;   /* Modern Teal */
-  --brand-secondary: #0f766e; /* Deep Teal for hovers/gradients */
-  --bg-color: #f8fafc;        /* Soft slate background */
-  --text-main: #0f172a;       /* Near black for headings */
-  --text-muted: #64748b;      /* Soft slate for paragraphs */
+  --brand-primary: #0d9488;
+  --brand-secondary: #0f766e;
+  --bg-color: #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
   --card-bg: #ffffff;
 }
 
@@ -17,59 +17,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* =========================================
-   Modern Bootstrap Overrides
-   ========================================= */
+/* ===== Bootstrap overrides (keep your existing ones) ===== */
+.btn-primary { background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary)); border: none; border-radius: 8px; padding: 0.6rem 1.5rem; font-weight: 500; box-shadow: 0 4px 6px -1px rgba(13,148,136,0.2); transition: all 0.3s ease; }
+.btn-primary:hover { background: linear-gradient(135deg, #0f766e, #115e59); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(13,148,136,0.3); }
+.btn-outline-primary { color: var(--brand-primary); border-color: var(--brand-primary); border-radius: 8px; font-weight: 500; transition: all 0.3s ease; }
+.btn-outline-primary:hover { background-color: var(--brand-primary); color: white; transform: translateY(-2px); }
+.form-control, .form-select { border-radius: 8px; border: 1px solid #e2e8f0; padding: 0.6rem 1rem; transition: all 0.2s ease; }
+.form-control:focus, .form-select:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 4px rgba(13,148,136,0.15); }
 
-/* Buttons */
-.btn-primary {
-  background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1.5rem;
-  font-weight: 500;
-  box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.2);
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #0f766e, #115e59);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(13, 148, 136, 0.3);
-}
-
-.btn-outline-primary {
-  color: var(--brand-primary);
-  border-color: var(--brand-primary);
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.btn-outline-primary:hover {
-  background-color: var(--brand-primary);
-  color: white;
-  transform: translateY(-2px);
-}
-
-/* Forms & Inputs */
-.form-control, .form-select {
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  padding: 0.6rem 1rem;
-  transition: all 0.2s ease;
-}
-
-.form-control:focus, .form-select:focus {
-  border-color: var(--brand-primary);
-  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15);
-}
-
-/* =========================================
-   Custom UI Components
-   ========================================= */
-
-/* Glassmorphism Navbar */
+/* ===== Glass Navbar ===== */
 .glass-navbar {
   background: rgba(255, 255, 255, 0.85) !important;
   backdrop-filter: blur(12px);
@@ -78,28 +34,110 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
 }
 
-/* Course Cards with Hover Physics */
-.modern-card {
-  background: var(--card-bg);
-  border: 1px solid #f1f5f9;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
+/* ===== Home Icon ===== */
+.home-icon {
+  font-size: 1.5rem;
+  color: var(--brand-primary);
+  text-decoration: none;
 }
 
-.modern-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: #e2e8f0;
+/* ===== Scrollable strip (used in top and bottom navbars) ===== */
+.scrollable-strip {
+  display: flex;
+  align-items: center;
+  flex: 1 1 0%;
+  min-width: 0;
+  justify-content: center;
 }
 
-/* Dropdown & Avatar Polish */
-.no-caret .dropdown-toggle::after {
-  display: none !important; /* Hides the default Bootstrap downward arrow */
+.scrollable-items {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  justify-content: center;
+}
+.scrollable-items.overflowing { justify-content: flex-start; }
+.scrollable-items::-webkit-scrollbar { display: none; }
+
+.category-chip, .course-chip {
+  text-decoration: none;
+  color: #334155;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  background: #f1f5f9;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+.category-chip:hover, .course-chip:hover { background: var(--brand-primary); color: #fff; }
+
+.scroll-arrow {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 1.2rem;
+  padding: 0.2rem 0.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: color 0.2s, background 0.2s;
+}
+.scroll-arrow:hover { color: var(--brand-primary); background: #f1f5f9; }
+
+.view-all-chip {
+  text-decoration: none;
+  color: #334155;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  background: #e2e8f0;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  transition: background 0.2s, color 0.2s;
+}
+.view-all-chip:hover { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
+
+/* ===== Search Form ===== */
+.search-form {
+  flex: 0 1 auto;
+  min-width: 100px;
+  max-width: 250px;
+}
+.search-form .input-group-text.search-icon {
+  background: white;
+  border-right: none;
+  color: var(--text-muted);
+}
+.search-form .form-control {
+  border-left: none;
+  box-shadow: none;
+  background: white;
 }
 
-/* Logged In Avatar */
+/* ===== Profile Dropdown ===== */
+.profile-container {
+  position: relative;
+}
+
+.profile-toggle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
 .avatar-circle {
   width: 40px;
   height: 40px;
@@ -111,10 +149,11 @@ body {
   justify-content: center;
   font-weight: 600;
   font-size: 1.1rem;
-  box-shadow: 0 2px 5px rgba(13, 148, 136, 0.3);
+  box-shadow: 0 2px 5px rgba(13,148,136,0.3);
+  transition: opacity 0.2s;
 }
+.avatar-circle:hover { opacity: 0.9; }
 
-/* Logged Out / Guest Avatar */
 .avatar-circle-guest {
   width: 40px;
   height: 40px;
@@ -126,24 +165,71 @@ body {
   justify-content: center;
   font-size: 1.2rem;
   border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
+  transition: background 0.2s, color 0.2s;
 }
+.avatar-circle-guest:hover { background: #e2e8f0; color: var(--brand-primary); }
 
-.avatar-circle-guest:hover {
-  background: #e2e8f0;
-  color: var(--brand-primary);
-}
-
-.dropdown-menu {
-  border: 1px solid #f1f5f9;
+.profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
   border-radius: 12px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-  padding: 0.5rem 0;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+  border: 1px solid #f1f5f9;
+  min-width: 220px;
+  z-index: 1050;
+  overflow: hidden;
 }
 
+.dropdown-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+.user-name { font-weight: 700; margin: 0; color: var(--text-main); }
+.user-email { font-size: 0.8rem; color: var(--text-muted); margin: 0; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+.profile-dropdown .dropdown-item {
+  padding: 0.6rem 1.5rem;
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text-main);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.1s;
+}
+.profile-dropdown .dropdown-item:hover { background: #f8fafc; }
 
-/* Custom Scrollbar */
+.profile-dropdown .logout-item { color: #ef4444; }
+.profile-dropdown .logout-item:hover { background: #fef2f2; }
+
+.profile-dropdown .guest-menu {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dropdown-divider { height: 1px; background: #e2e8f0; margin: 0.25rem 0; }
+
+/* ===== Second Navbar (Courses) ===== */
+.courses-bar {
+  background: white;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  z-index: 1020;
+}
+
+/* ===== Mobile adjustments ===== */
+@media (max-width: 991.98px) {
+  .search-form { max-width: 180px; }
+}
+
+/* ===== Custom scrollbar (global) ===== */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }

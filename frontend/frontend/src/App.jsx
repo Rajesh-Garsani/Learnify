@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 import "./axiosConfig";
-
+import AllCategories from './pages/AllCategories';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import CourseDetail from './pages/CourseDetail';
@@ -17,6 +17,9 @@ import AIChatbot from './components/AIChatbot';
 import SearchPage from './components/SearchPage';
 import Courses from './pages/Courses';
 
+// ⭐ NEW IMPORTS (Only Footer and DynamicPage now!)
+import DynamicPage from './pages/DynamicPage';
+import Footer from './components/Footer';
 
 // BUG 5 FIX: Added a ProtectedRoute wrapper to stop sudden logouts on browser refresh
 const ProtectedRoute = ({ children }) => {
@@ -30,10 +33,12 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <div className="App">
+      {/* Added d-flex flex-column min-vh-100 so footer sticks to bottom */}
+      <div className="App d-flex flex-column min-vh-100">
         <Navbar />
 
-        <main style={{ position: 'relative', minHeight: '80vh' }}>
+        {/* flex-grow-1 makes the main content take up remaining screen space */}
+        <main className="flex-grow-1" style={{ position: 'relative' }}>
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
@@ -44,9 +49,12 @@ function App() {
             <Route path="/subcategory/:subcategoryId" element={<SubCategoryPage />} />
             <Route path="/category/:categoryId" element={<SubCategoryPage />} />
             <Route path="/search" element={<SearchPage />} />
-            {/* 2. Add this exact route */}
             <Route path="/courses" element={<Courses />} />
-            <Route path="/course/:id" element={<CourseDetail />} />
+            <Route path="/categories" element={<AllCategories />} />
+            {/* ⭐ DYNAMIC LEGAL ROUTES (Managed via Django Admin) */}
+            <Route path="/about" element={<DynamicPage slug="about" />} />
+            <Route path="/privacy" element={<DynamicPage slug="privacy" />} />
+            <Route path="/terms" element={<DynamicPage slug="terms" />} />
 
             {/* Protected Routes */}
             <Route path="/profile" element={
@@ -58,6 +66,8 @@ function App() {
         </main>
 
         <AIChatbot />
+
+        <Footer />
 
       </div>
     </Router>
