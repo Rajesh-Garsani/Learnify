@@ -6,6 +6,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../App.css";
 
+// ✅ Define API base URL from environment variable or fallback to localhost
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 function Home() {
   const [courses, setCourses] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -62,7 +65,6 @@ function Home() {
         <h1 className="display-4 fw-bold mb-3 text-animate" style={{ color: 'var(--brand-primary)' }}>
           Learn To Code
         </h1>
-
       </div>
 
       {/* Carousel */}
@@ -119,7 +121,7 @@ function Home() {
                   {course.thumbnail ? (
                     <Card.Img
                       variant="top"
-                      src={course.thumbnail.startsWith('http') ? course.thumbnail : `http://127.0.0.1:8000${course.thumbnail}`}
+                      src={course.thumbnail.startsWith('http') ? course.thumbnail : `${API_BASE_URL}${course.thumbnail}`}
                       style={{ height: '160px', objectFit: 'cover' }}
                       alt={course.title}
                     />
@@ -163,7 +165,6 @@ function Home() {
           </Col>
         )}
       </Row>
-
 
       {/* =========================================
           CATEGORIES SECTION (3 per row on mobile)
@@ -235,17 +236,17 @@ function Home() {
         /* --- Responsive card adjustments --- */
         @media (max-width: 576px) {
           .card-title-responsive {
-            font-size: 0.85rem !important;  /* smaller title on mobile */
+            font-size: 0.85rem !important;
           }
           .card-desc-responsive {
-            font-size: 0.75rem !important;  /* smaller description */
+            font-size: 0.75rem !important;
           }
           .btn-responsive {
-            font-size: 0.75rem !important;  /* smaller button text */
+            font-size: 0.75rem !important;
             padding: 0.3rem 0.5rem !important;
           }
           .card-body {
-            padding: 0.75rem !important;    /* less padding on mobile */
+            padding: 0.75rem !important;
           }
         }
 
