@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Container, Row, Col, Card, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Card, Spinner, Button } from 'react-bootstrap';
 
 const AllCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -58,15 +58,14 @@ const AllCategories = () => {
             No categories found. Check back soon!
           </div>
         ) : (
-          /* Bootstrap Grid Layout for Cards */
           <Row className="g-4">
             {categories.map((category) => (
-              <Col lg={3} md={4} sm={6} key={category.id}>
+              <Col xs={4} sm={6} md={4} lg={3} key={category.id}>
                 <Card className="h-100 shadow-sm border-0 category-card">
 
-                  {/* Image Placeholder */}
+                  {/* Image – hidden on extra‑small screens */}
                   {category.image && (
-                    <div style={{ height: '160px', overflow: 'hidden', backgroundColor: '#e9ecef' }}>
+                    <div className="d-none d-sm-block" style={{ height: '160px', overflow: 'hidden', backgroundColor: '#e9ecef' }}>
                       <Card.Img
                         variant="top"
                         src={category.image}
@@ -75,27 +74,28 @@ const AllCategories = () => {
                     </div>
                   )}
 
-                  <Card.Body className="d-flex flex-column p-4">
-                    <Card.Title className="fw-bold mb-3 text-dark">
+                  <Card.Body className="d-flex flex-column p-3 p-md-4 flex-grow-1">
+                    <Card.Title className="fw-bold mb-3 text-dark card-title-responsive">
                       {category.name}
                     </Card.Title>
 
-                    {/* Safely render HTML from CKEditor */}
+                    {/* Safely render HTML from CKEditor, clamped to 3 lines */}
                     {category.description && (
                       <div
-                        className="text-muted small mb-4 flex-grow-1"
-                        style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                        className="text-muted small mb-4 flex-grow-1 line-clamp-3 card-desc-responsive"
                         dangerouslySetInnerHTML={{ __html: category.description }}
                       />
                     )}
 
-                    {/* Action Link */}
-                    <Link
+                    {/* Action Button – smaller on mobile, text changed, arrow removed */}
+                    <Button
+                      as={Link}
                       to={`/category/${category.id}`}
-                      className="mt-auto fw-bold text-decoration-none d-flex align-items-center"
+                      variant="outline-primary"
+                      className="mt-auto w-100 fw-bold rounded-3 btn-responsive"
                     >
-                      View Courses <i className="bi bi-arrow-right ms-2"></i>
-                    </Link>
+                      View All Courses
+                    </Button>
                   </Card.Body>
 
                 </Card>
@@ -105,10 +105,51 @@ const AllCategories = () => {
         )}
       </Container>
 
-      {/* Inline styles for the card hover effect */}
       <style>{`
-        .category-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .category-card:hover { transform: translateY(-5px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+        .category-card {
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .category-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+        }
+
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        /* Responsive text & button sizing */
+        @media (max-width: 576px) {
+          .card-title-responsive {
+            font-size: 0.85rem !important;
+          }
+          .card-desc-responsive {
+            font-size: 0.75rem !important;
+          }
+          .btn-responsive {
+            font-size: 0.7rem !important;      /* even smaller on mobile */
+            padding: 0.25rem 0.4rem !important; /* reduced padding */
+          }
+          .card-body {
+            padding: 0.75rem !important;
+          }
+        }
+
+        @media (min-width: 577px) and (max-width: 768px) {
+          .card-title-responsive {
+            font-size: 0.95rem !important;
+          }
+          .card-desc-responsive {
+            font-size: 0.8rem !important;
+          }
+          .btn-responsive {
+            font-size: 0.8rem !important;
+            padding: 0.4rem 0.75rem !important;
+          }
+        }
       `}</style>
     </div>
   );

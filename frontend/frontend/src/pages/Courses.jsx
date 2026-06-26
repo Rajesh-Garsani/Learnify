@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Alert, Form, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import axios from '../axiosConfig'; // Ensure this path is correct for your project
+import axios from '../axiosConfig';
 import "../index.css";
 
 function Courses() {
@@ -20,7 +20,6 @@ function Courses() {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      // Build the query string based on filters
       let query = '/api/courses/?';
       if (difficultyFilter) query += `difficulty=${difficultyFilter}&`;
       if (priceFilter === 'free') query += `is_free=true&`;
@@ -53,11 +52,53 @@ function Courses() {
     }
   };
 
+  // Filter components (shared logic)
+  const DifficultySelect = ({ compact = false }) => (
+    <Form.Select
+      value={difficultyFilter}
+      onChange={(e) => setDifficultyFilter(e.target.value)}
+      className="shadow-none rounded-3"
+      size={compact ? "sm" : undefined}
+      style={compact ? { fontSize: '0.7rem', padding: '0.2rem 0.5rem' } : {}}
+    >
+      <option value="">All Levels</option>
+      <option value="beginner">Beginner</option>
+      <option value="intermediate">Intermediate</option>
+      <option value="advanced">Advanced</option>
+    </Form.Select>
+  );
+
+  const PriceSelect = ({ compact = false }) => (
+    <Form.Select
+      value={priceFilter}
+      onChange={(e) => setPriceFilter(e.target.value)}
+      className="shadow-none rounded-3"
+      size={compact ? "sm" : undefined}
+      style={compact ? { fontSize: '0.7rem', padding: '0.2rem 0.5rem' } : {}}
+    >
+      <option value="">All Prices</option>
+      <option value="free">Free Courses</option>
+      <option value="paid">Premium (Paid)</option>
+    </Form.Select>
+  );
+
+  const ClearButton = ({ compact = false }) => (
+    <Button
+      variant="outline-secondary"
+      className="rounded-3"
+      size={compact ? "sm" : undefined}
+      style={compact ? { fontSize: '0.7rem', padding: '0.2rem 0.5rem', width: '100%' } : { width: '100%' }}
+      onClick={() => { setDifficultyFilter(''); setPriceFilter(''); }}
+    >
+      Clear
+    </Button>
+  );
+
   return (
     <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '4rem' }}>
 
       {/* Page Header */}
-      <div className="bg-white border-bottom py-5 mb-5 shadow-sm">
+      <div className="bg-white border-bottom py-5 mb-4 shadow-sm">
         <Container>
           <Row className="align-items-center">
             <Col md={8}>
@@ -71,47 +112,49 @@ function Courses() {
       <Container>
         {error && <Alert variant="danger" className="border-0 shadow-sm rounded-3">{error}</Alert>}
 
+        {/* ===== TOP FILTER BAR – visible only on smaller screens (hidden on lg+) ===== */}
+        <div
+          className="bg-white p-2 rounded-4 shadow-sm mb-3 d-lg-none sticky-top"
+          style={{ zIndex: 1030, top: '0' }}
+        >
+          <div className="d-flex flex-nowrap gap-2 align-items-center">
+            <div className="flex-grow-1" style={{ minWidth: 0 }}>
+              <Form.Label className="fw-medium text-muted small text-uppercase mb-0" style={{ fontSize: '0.6rem' }}>
+                Difficulty
+              </Form.Label>
+              <DifficultySelect compact />
+            </div>
+            <div className="flex-grow-1" style={{ minWidth: 0 }}>
+              <Form.Label className="fw-medium text-muted small text-uppercase mb-0" style={{ fontSize: '0.6rem' }}>
+                Price
+              </Form.Label>
+              <PriceSelect compact />
+            </div>
+            <div style={{ flex: '0 0 auto' }}>
+              <ClearButton compact />
+            </div>
+          </div>
+        </div>
+
+        {/* ===== MAIN ROW: Sidebar + Course Grid ===== */}
         <Row>
-          {/* Sidebar Filters */}
-          <Col lg={3} className="mb-4">
+          {/* Sidebar Filter – visible only on lg+ */}
+          <Col lg={3} className="d-none d-lg-block">
             <Card className="border-0 shadow-sm rounded-4 sticky-top" style={{ top: '100px' }}>
               <Card.Body className="p-4">
                 <h5 className="fw-bold mb-4">Filter Courses</h5>
 
                 <Form.Group className="mb-4">
                   <Form.Label className="fw-medium text-muted small text-uppercase">Difficulty</Form.Label>
-                  <Form.Select
-                    value={difficultyFilter}
-                    onChange={(e) => setDifficultyFilter(e.target.value)}
-                    className="shadow-none rounded-3"
-                  >
-                    <option value="">All Levels</option>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                  </Form.Select>
+                  <DifficultySelect />
                 </Form.Group>
 
                 <Form.Group className="mb-4">
                   <Form.Label className="fw-medium text-muted small text-uppercase">Price</Form.Label>
-                  <Form.Select
-                    value={priceFilter}
-                    onChange={(e) => setPriceFilter(e.target.value)}
-                    className="shadow-none rounded-3"
-                  >
-                    <option value="">All Prices</option>
-                    <option value="free">Free Courses</option>
-                    <option value="paid">Premium (Paid)</option>
-                  </Form.Select>
+                  <PriceSelect />
                 </Form.Group>
 
-                <Button
-                  variant="outline-secondary"
-                  className="w-100 rounded-3"
-                  onClick={() => { setDifficultyFilter(''); setPriceFilter(''); }}
-                >
-                  Clear Filters
-                </Button>
+                <ClearButton />
               </Card.Body>
             </Card>
           </Col>
@@ -126,35 +169,27 @@ function Courses() {
               <Row className="g-4">
                 {courses.length > 0 ? (
                   courses.map(course => (
-                    <Col key={course.id} xs={12} sm={6} xl={4}>
-                      <Card className="modern-card h-100 border-0" style={{ borderRadius: '12px' }}>
-                        {course.thumbnail ? (
-                          <div style={{ position: 'relative' }}>
+                    <Col key={course.id} xs={4} sm={6} md={4} lg={4}>
+                      <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+
+                        {/* Thumbnail – hidden on extra‑small screens */}
+                        <div className="d-none d-sm-block">
+                          {course.thumbnail ? (
                             <Card.Img
                               variant="top"
                               src={course.thumbnail.startsWith('http') ? course.thumbnail : `http://127.0.0.1:8000${course.thumbnail}`}
                               style={{ height: '160px', objectFit: 'cover' }}
                               alt={course.title}
                             />
-                          </div>
-                        ) : (
-                          <div style={{ height: '160px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <i className="bi bi-image" style={{ color: '#cbd5e1', fontSize: '2rem' }}></i>
-                          </div>
-                        )}
+                          ) : (
+                            <div style={{ height: '160px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <i className="bi bi-image" style={{ color: '#cbd5e1', fontSize: '2rem' }}></i>
+                            </div>
+                          )}
+                        </div>
 
-                        <Card.Body className="d-flex flex-column p-3">
-                          <Card.Title className="fw-bold mb-1" style={{ fontSize: '1rem', color: 'var(--text-main)', lineHeight: '1.2' }}>
-                            {course.title}
-                          </Card.Title>
-
-                          <Card.Text className="text-muted flex-grow-1 mb-3" style={{
-                            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: '1.4', fontSize: '0.8rem'
-                          }}>
-                            {stripHtml(course.short_description)}
-                          </Card.Text>
-
-                           <div className="d-flex justify-content-between align-items-center mt-auto mb-3">
+                        <Card.Body className="d-flex flex-column p-3 p-md-4 flex-grow-1">
+                          <div className="d-flex justify-content-between align-items-start mb-2">
                             <Badge
                               style={{
                                 backgroundColor: getDifficultyColor(course.difficulty),
@@ -164,12 +199,26 @@ function Courses() {
                             >
                               {course.difficulty}
                             </Badge>
-                            <span className="fw-bold text-muted" style={{ fontSize: '0.8rem' }}>
+                            <span className="fw-bold" style={{ color: course.is_free ? '#10b981' : 'var(--text-main)', fontSize: '0.8rem' }}>
                               {course.is_free ? 'Free' : `$${course.price}`}
                             </span>
                           </div>
 
-                          <Button as={Link} to={`/course/${course.id}`} variant="primary" className="w-100 py-1" style={{ fontSize: '0.85rem', fontWeight: '500' }}>
+                          <Card.Title className="h6 fw-bold mb-2 line-clamp-2 card-title-responsive">
+                            {course.title}
+                          </Card.Title>
+
+                          <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-3 card-desc-responsive">
+                            {stripHtml(course.short_description)}
+                          </Card.Text>
+
+                          <Button
+                            as={Link}
+                            to={`/course/${course.id}`}
+                            variant="outline-primary"
+                            className="mt-auto w-100 fw-bold rounded-3 btn-responsive"
+                            size="sm"
+                          >
                             View Course
                           </Button>
                         </Card.Body>
@@ -193,6 +242,52 @@ function Courses() {
           </Col>
         </Row>
       </Container>
+
+      {/* Inline styles for card hover, truncation, and responsiveness */}
+      <style>{`
+        .transition-hover {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .transition-hover:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        @media (max-width: 576px) {
+          .card-title-responsive {
+            font-size: 0.85rem !important;
+          }
+          .card-desc-responsive {
+            font-size: 0.75rem !important;
+          }
+          .btn-responsive {
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.5rem !important;
+          }
+          .card-body {
+            padding: 0.75rem !important;
+          }
+        }
+
+        @media (min-width: 577px) and (max-width: 768px) {
+          .card-title-responsive {
+            font-size: 0.95rem !important;
+          }
+          .card-desc-responsive {
+            font-size: 0.8rem !important;
+          }
+          .btn-responsive {
+            font-size: 0.8rem !important;
+            padding: 0.4rem 0.75rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

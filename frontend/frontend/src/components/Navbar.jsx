@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Navbar as BootstrapNavbar, Container, Nav, NavDropdown, Button, Form, InputGroup } from 'react-bootstrap';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import '../index.css';   // <-- make sure path matches your structure
+import '../index.css';
 
 function Navbar() {
   const [categories, setCategories] = useState([]);
@@ -20,13 +20,11 @@ function Navbar() {
   const coursesScrollRef = useRef(null);
   const profileRef = useRef(null);
 
-  // Arrow visibility for scrollable strips
   const [showCategoriesLeft, setShowCategoriesLeft] = useState(false);
   const [showCategoriesRight, setShowCategoriesRight] = useState(false);
   const [showCoursesLeft, setShowCoursesLeft] = useState(false);
   const [showCoursesRight, setShowCoursesRight] = useState(false);
 
-  // Utility: safely extract array from different API response shapes
   const universalArray = (data) =>
     Array.isArray(data)
       ? data
@@ -44,7 +42,6 @@ function Navbar() {
     }
   };
 
-  // Update arrow visibility based on scroll position and overflow
   const updateScrollArrows = useCallback((ref, setLeft, setRight) => {
     const el = ref.current;
     if (!el) return;
@@ -58,7 +55,6 @@ function Navbar() {
     setRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
   }, []);
 
-  // Close profile dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -69,7 +65,6 @@ function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Scroll and resize listeners for arrow buttons
   useEffect(() => {
     const categoriesEl = categoriesScrollRef.current;
     const coursesEl = coursesScrollRef.current;
@@ -93,13 +88,11 @@ function Navbar() {
     };
   }, [categories, courses, updateScrollArrows]);
 
-  // Close mobile menu and profile when route changes
   useEffect(() => {
     setExpanded(false);
     setProfileOpen(false);
   }, [location.pathname]);
 
-  // Initial data fetch and keyboard shortcut
   useEffect(() => {
     fetchCategories();
     fetchCourses();
@@ -179,12 +172,10 @@ function Navbar() {
       {/* ---- TOP NAVBAR ---- */}
       <BootstrapNavbar expand="lg" className="glass-navbar" expanded={expanded} onToggle={setExpanded}>
         <Container fluid className="d-flex align-items-center flex-nowrap">
-          {/* Home icon */}
           <Link to="/" className="home-icon me-2 flex-shrink-0">
             <i className="bi bi-house-door-fill"></i>
           </Link>
 
-          {/* Desktop categories strip */}
           {categories.length > 0 && (
             <div className="scrollable-strip d-none d-lg-flex">
               {showCategoriesLeft && (
@@ -204,17 +195,15 @@ function Navbar() {
                   <i className="bi bi-chevron-right"></i>
                 </button>
               )}
-              <Link to="/categories" className="view-all-chip ms-2">View All</Link>
             </div>
           )}
 
-          {/* Search bar */}
           <Form onSubmit={handleSearch} className="search-form ms-auto me-2">
             <InputGroup size="sm">
               <InputGroup.Text className="search-icon"><i className="bi bi-search"></i></InputGroup.Text>
               <Form.Control
                 ref={searchInputRef}
-                type="search"
+                type="search..."
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -222,7 +211,6 @@ function Navbar() {
             </InputGroup>
           </Form>
 
-          {/* Profile dropdown (custom) */}
           <div className="profile-container flex-shrink-0" ref={profileRef}>
             <button
               className="profile-toggle-btn"
@@ -266,21 +254,23 @@ function Navbar() {
             )}
           </div>
 
-          {/* Mobile toggle (hamburger) */}
           <BootstrapNavbar.Toggle aria-controls="navbar-mobile" className="border-0 shadow-none ms-2 d-lg-none" />
         </Container>
 
-        {/* Mobile collapsible categories */}
         <BootstrapNavbar.Collapse id="navbar-mobile">
           <Nav className="d-lg-none mt-2">
             <NavDropdown title="Categories" id="mobile-categories-dropdown">
-              {categories.map(cat => (
-                <NavDropdown.Item as={Link} to={`/category/${cat.id}`} key={cat.id}>
-                  {cat.name}
-                </NavDropdown.Item>
-              ))}
+              {categories
+                .filter(cat => !['categories', 'category'].includes(cat.name.toLowerCase()))
+                .map(cat => (
+                  <NavDropdown.Item as={Link} to={`/category/${cat.id}`} key={cat.id}>
+                    {cat.name}
+                  </NavDropdown.Item>
+                ))}
               <NavDropdown.Divider />
-              <NavDropdown.Item as={Link} to="/categories">View All Categories</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/categories">
+                View All Categories
+              </NavDropdown.Item>
             </NavDropdown>
           </Nav>
         </BootstrapNavbar.Collapse>
@@ -308,7 +298,6 @@ function Navbar() {
                   <i className="bi bi-chevron-right"></i>
                 </button>
               )}
-              <Link to="/courses" className="view-all-chip ms-2">View All</Link>
             </div>
           </Container>
         </div>

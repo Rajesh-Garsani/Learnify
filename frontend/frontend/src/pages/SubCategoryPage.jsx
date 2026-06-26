@@ -110,7 +110,7 @@ function SubCategoryPage() {
       case 'beginner': return '#10b981';
       case 'intermediate': return '#f59e0b';
       case 'advanced': return '#ef4444';
-      default: return '#6b7280';
+      default: return '#64748b';
     }
   };
 
@@ -121,90 +121,58 @@ function SubCategoryPage() {
     return tmp.textContent || tmp.innerText || "";
   };
 
-  if (loading) {
-    return (
-      <Container className="my-5 py-5">
-        <div className="text-center">
-          <Spinner animation="border" role="status" style={{ width: '3rem', height: '3rem' }}>
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-          <p className="mt-3 text-muted">Loading courses...</p>
-        </div>
-      </Container>
-    );
-  }
+  if (loading) return (
+    <Container className="my-5 py-5 text-center">
+      <Spinner animation="border" variant="primary" style={{ width: '3rem', height: '3rem' }} />
+      <p className="mt-3 text-muted">Loading courses...</p>
+    </Container>
+  );
 
-  if (error) {
-    return (
-      <Container className="my-5 py-5">
-        <Alert variant="danger" className="text-center" style={{ borderRadius: '8px' }}>
-          <i className="bi bi-exclamation-triangle me-2"></i>
-          {error}
-        </Alert>
-        <div className="text-center">
-          <Link to="/" className="btn btn-primary" style={{
-            background: 'linear-gradient(135deg, #2c5282, #4a90e2)',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '0.75rem 2rem'
-          }}>
-            <i className="bi bi-house me-2"></i>
-            Back to Home
-          </Link>
-        </div>
-      </Container>
-    );
-  }
+  if (error) return (
+    <Container className="my-5 py-5 text-center">
+      <Alert variant="danger" className="mx-auto" style={{ maxWidth: '600px', borderRadius: '12px' }}>
+        <i className="bi bi-exclamation-triangle me-2"></i> {error}
+      </Alert>
+      <Button as={Link} to="/" className="btn-primary mt-3">
+        <i className="bi bi-house me-2"></i> Back to Home
+      </Button>
+    </Container>
+  );
 
   return (
     <Container className="mt-4 pb-5">
-      <Breadcrumb className="mt-3" style={{ background: 'transparent', padding: 0 }}>
-        <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/" }} style={{ color: '#666' }}>
-          <i className="bi bi-house me-1"></i>
-          Home
-        </Breadcrumb.Item>
+      <Breadcrumb className="mb-4 small fw-medium">
+        <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/" }} className="text-muted"><i className="bi bi-house me-1"></i> Home</Breadcrumb.Item>
         {selectedSubcategory?.category_name && (
-          <Breadcrumb.Item linkAs={Link} linkProps={{ to: `/category/${selectedSubcategory.category}` }} style={{ color: '#666' }}>
+          <Breadcrumb.Item linkAs={Link} linkProps={{ to: `/category/${selectedSubcategory.category}` }} className="text-muted">
             {selectedSubcategory.category_name}
           </Breadcrumb.Item>
         )}
-        <Breadcrumb.Item active style={{ color: '#2c5282', fontWeight: '500' }}>
-          {selectedSubcategory?.name}
-        </Breadcrumb.Item>
+        <Breadcrumb.Item active style={{ color: 'var(--brand-primary)' }}>{selectedSubcategory?.name}</Breadcrumb.Item>
       </Breadcrumb>
 
       <Row className="mb-5">
         <Col>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3">
             <div>
-              <h1 className="fw-bold mb-2" style={{
-                background: 'linear-gradient(45deg, #2c5282, #4a90e2)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
-                {selectedSubcategory?.name}
-              </h1>
-
+              <h1 className="fw-bolder mb-3 display-6 text-dark">{selectedSubcategory?.name}</h1>
               {selectedSubcategory?.description ? (
-                <div className="text-muted mb-0" style={{ fontSize: '1.1rem' }} dangerouslySetInnerHTML={{ __html: selectedSubcategory.description }} />
+                <div className="text-muted fs-5 mb-3" dangerouslySetInnerHTML={{ __html: selectedSubcategory.description }} />
               ) : (
-                <p className="text-muted mb-0" style={{ fontSize: '1.1rem' }}>Explore courses in this category</p>
+                <p className="text-muted fs-5 mb-3">Explore courses in this category</p>
               )}
-
-              <div className="mt-3">
-                <Badge bg="light" text="dark" className="me-2" style={{ padding: '0.5rem 1rem', borderRadius: '20px', fontWeight: '500' }}>
-                  <i className="bi bi-book me-1"></i>
-                  {courses.length} {courses.length === 1 ? 'Course' : 'Courses'}
+              <div className="d-flex gap-2">
+                <Badge bg="white" text="dark" className="border px-3 py-2 rounded-pill fw-medium shadow-sm">
+                  <i className="bi bi-book text-primary me-2"></i>{courses.length} {courses.length === 1 ? 'Course' : 'Courses'}
                 </Badge>
-                <Badge bg="light" text="dark" style={{ padding: '0.5rem 1rem', borderRadius: '20px', fontWeight: '500' }}>
-                  <i className="bi bi-people me-1"></i>
-                  {subcategories.length} Subcategories
+                <Badge bg="white" text="dark" className="border px-3 py-2 rounded-pill fw-medium shadow-sm">
+                  <i className="bi bi-tags text-primary me-2"></i>{subcategories.length} Subcategories
                 </Badge>
               </div>
             </div>
 
-            <div className="d-none d-lg-block">
-              <Form.Select size="sm" value={sortBy} onChange={handleSortChange} style={{ border: '1px solid #e0e0e0', borderRadius: '8px', padding: '0.5rem 1rem', fontSize: '0.9rem', background: 'white', color: '#555' }}>
+            <div className="w-100" style={{ maxWidth: '250px' }}>
+              <Form.Select value={sortBy} onChange={handleSortChange} className="shadow-sm border-0 py-2">
                 <option value="popular">Most Popular</option>
                 <option value="newest">Newest First</option>
                 <option value="rating">Highest Rated</option>
@@ -214,143 +182,252 @@ function SubCategoryPage() {
         </Col>
       </Row>
 
+      {/* ===== MOBILE FILTER BAR (sticky, hidden on lg) ===== */}
+      <div className="bg-white p-2 rounded-4 shadow-sm mb-3 d-lg-none sticky-top" style={{ zIndex: 1030, top: '0' }}>
+        <div className="d-flex flex-nowrap gap-2 align-items-center">
+          {/* Subcategory selector – dropdown on mobile */}
+          <div className="flex-grow-1" style={{ minWidth: 0 }}>
+            <Form.Select
+              value={selectedSubcategory?.id || ''}
+              onChange={(e) => {
+                const subcat = subcategories.find(sc => sc.id === parseInt(e.target.value));
+                if (subcat) handleSubcategoryClick(subcat);
+              }}
+              className="shadow-none rounded-3"
+              size="sm"
+              style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}
+            >
+              <option value="">Select Topic</option>
+              {subcategories.map(sc => (
+                <option key={sc.id} value={sc.id}>{sc.name}</option>
+              ))}
+            </Form.Select>
+          </div>
+
+          {/* Difficulty dropdown */}
+          <div className="flex-grow-1" style={{ minWidth: 0 }}>
+            <Form.Select
+              value={difficulty}
+              onChange={(e) => handleDifficultyClick(e.target.value)}
+              className="shadow-none rounded-3"
+              size="sm"
+              style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}
+            >
+              <option value="">All Levels</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </Form.Select>
+          </div>
+
+          {/* Search input – smaller */}
+          <div className="flex-grow-1" style={{ minWidth: 0 }}>
+            <Form onSubmit={handleSearch} className="d-flex">
+              <Form.Control
+                type="search"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="shadow-none rounded-3"
+                size="sm"
+                style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}
+              />
+              <Button type="submit" variant="outline-secondary" size="sm" className="ms-1" style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}>
+                <i className="bi bi-search"></i>
+              </Button>
+            </Form>
+          </div>
+        </div>
+      </div>
+
       <Row>
-        <Col lg={3} className="mb-4">
-          <Card className="mb-4" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', border: 'none', borderRadius: '12px' }}>
+        {/* SIDEBAR FILTERS – visible only on lg+ */}
+        <Col lg={3} className="d-none d-lg-block mb-4">
+          <Card className="modern-card mb-4 border-0">
             <Card.Body className="p-3">
               <Form onSubmit={handleSearch}>
                 <InputGroup>
-                  <Form.Control type="search" placeholder="Search in category..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ border: '1px solid #e0e0e0', borderRight: 'none', borderRadius: '8px 0 0 8px', fontSize: '0.9rem' }} />
-                  <Button variant="outline-secondary" type="submit" style={{ border: '1px solid #e0e0e0', borderLeft: 'none', borderRadius: '0 8px 8px 0', color: '#666' }}>
-                    <i className="bi bi-search"></i>
-                  </Button>
+                  <Form.Control type="search" placeholder="Search in category..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="border-end-0 shadow-none bg-light" />
+                  <Button variant="light" type="submit" className="border border-start-0 text-muted"><i className="bi bi-search"></i></Button>
                 </InputGroup>
               </Form>
             </Card.Body>
           </Card>
 
-          <Card className="mb-4" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', border: 'none', borderRadius: '12px' }}>
-            <Card.Header style={{ background: 'white', border: 'none', padding: '1rem 1rem 0.5rem' }}>
-              <h6 className="mb-0 fw-semibold" style={{ display: 'flex', alignItems: 'center' }}><i className="bi bi-grid me-2" style={{ color: '#2c5282' }}></i> Select Language</h6>
+          <Card className="modern-card mb-4 border-0">
+            <Card.Header className="bg-white border-bottom p-3">
+              <h6 className="mb-0 fw-bold"><i className="bi bi-grid-fill me-2" style={{ color: 'var(--brand-primary)' }}></i> Select Topic</h6>
             </Card.Header>
-            <ListGroup variant="flush" style={{ padding: '0.5rem' }}>
-              {subcategories.map(sc => (
-                <ListGroup.Item key={sc.id} action onClick={() => handleSubcategoryClick(sc)} style={{ border: 'none', borderRadius: '8px', padding: '0.75rem 1rem', marginBottom: '0.25rem', cursor: 'pointer', transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', background: selectedSubcategory?.id === sc.id ? 'linear-gradient(135deg, #2c5282, #4a90e2)' : 'transparent', color: selectedSubcategory?.id === sc.id ? 'white' : '#555' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                    <div style={{ width: '4px', height: '16px', background: selectedSubcategory?.id === sc.id ? 'white' : '#e0e0e0', borderRadius: '2px', marginRight: '0.75rem', transition: 'all 0.3s ease' }}></div>
-                    <span>{sc.name}</span>
-                  </div>
-                  {selectedSubcategory?.id === sc.id && <i className="bi bi-chevron-right ms-auto"></i>}
-                </ListGroup.Item>
-              ))}
+            <ListGroup variant="flush" className="p-2">
+              {subcategories.map(sc => {
+                const isActive = selectedSubcategory?.id === sc.id;
+                return (
+                  <ListGroup.Item key={sc.id} action onClick={() => handleSubcategoryClick(sc)}
+                    className="border-0 rounded-3 mb-1 d-flex align-items-center transition-all fw-medium"
+                    style={{ background: isActive ? 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' : 'transparent', color: isActive ? 'white' : 'var(--text-muted)' }}>
+                    <div className="d-flex align-items-center flex-grow-1">
+                      <div style={{ width: '4px', height: '16px', background: isActive ? 'white' : '#e2e8f0', borderRadius: '2px', marginRight: '0.75rem' }}></div>
+                      {sc.name}
+                    </div>
+                    {isActive && <i className="bi bi-chevron-right ms-auto"></i>}
+                  </ListGroup.Item>
+                );
+              })}
             </ListGroup>
           </Card>
 
-          <Card className="mb-4" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', border: 'none', borderRadius: '12px' }}>
-            <Card.Header style={{ background: 'white', border: 'none', padding: '1rem 1rem 0.5rem' }}>
-              <h6 className="mb-0 fw-semibold" style={{ display: 'flex', alignItems: 'center' }}><i className="bi bi-filter me-2" style={{ color: '#2c5282' }}></i> Filter by Level</h6>
+          <Card className="modern-card mb-4 border-0">
+            <Card.Header className="bg-white border-bottom p-3">
+              <h6 className="mb-0 fw-bold"><i className="bi bi-filter-circle-fill me-2" style={{ color: 'var(--brand-primary)' }}></i> Filter by Level</h6>
             </Card.Header>
-            <ListGroup variant="flush">
+            <ListGroup variant="flush" className="p-2">
               {[
-                { value: '', label: 'All Levels', icon: 'bi-grid' },
-                { value: 'beginner', label: 'Beginner', icon: 'bi-arrow-up-right-circle' },
-                { value: 'intermediate', label: 'Intermediate', icon: 'bi-arrow-up-right-circle-fill' },
-                { value: 'advanced', label: 'Advanced', icon: 'bi-star-fill' }
-              ].map(level => (
-                <ListGroup.Item key={level.value} action onClick={() => handleDifficultyClick(level.value)} style={{ border: 'none', borderRadius: '8px', padding: '0.75rem 1rem', marginBottom: '0.25rem', cursor: 'pointer', transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', background: difficulty === level.value ? 'linear-gradient(135deg, #2c5282, #4a90e2)' : 'transparent', color: difficulty === level.value ? 'white' : '#555' }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <i className={`bi ${level.icon} me-2`}></i>
-                    <span>{level.label}</span>
-                  </div>
-                </ListGroup.Item>
-              ))}
+                { value: '', label: 'All Levels', icon: 'bi-layer-backward' },
+                { value: 'beginner', label: 'Beginner', icon: 'bi-battery-half' },
+                { value: 'intermediate', label: 'Intermediate', icon: 'bi-battery-full' },
+                { value: 'advanced', label: 'Advanced', icon: 'bi-lightning-charge-fill' }
+              ].map(level => {
+                const isActive = difficulty === level.value;
+                return (
+                  <ListGroup.Item key={level.value} action onClick={() => handleDifficultyClick(level.value)}
+                    className="border-0 rounded-3 mb-1 d-flex align-items-center transition-all fw-medium"
+                    style={{ background: isActive ? 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' : 'transparent', color: isActive ? 'white' : 'var(--text-muted)' }}>
+                    <i className={`bi ${level.icon} me-3`}></i>{level.label}
+                  </ListGroup.Item>
+                );
+              })}
             </ListGroup>
           </Card>
-
-          <div className="d-lg-none mb-4">
-            <Card style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', border: 'none', borderRadius: '12px' }}>
-              <Card.Body className="p-3">
-                <Form.Select value={sortBy} onChange={handleSortChange} style={{ border: '1px solid #e0e0e0', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.9rem', background: 'white', color: '#555', width: '100%' }}>
-                  <option value="popular">Most Popular</option>
-                  <option value="newest">Newest First</option>
-                  <option value="rating">Highest Rated</option>
-                </Form.Select>
-              </Card.Body>
-            </Card>
-          </div>
         </Col>
 
+        {/* COURSES GRID */}
         <Col lg={9}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h5 className="mb-0 fw-semibold" style={{ fontSize: '1.1rem' }}>
-              {courses.length} {courses.length === 1 ? 'Course' : 'Courses'} Available
-              {difficulty && <span className="text-muted fw-normal" style={{ marginLeft: '0.5rem' }}>- {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Level</span>}
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h5 className="mb-0 fw-bold text-dark">
+              {courses.length} {courses.length === 1 ? 'Course' : 'Courses'}
+              {difficulty && <span className="text-muted fw-normal ms-2">- {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</span>}
             </h5>
-            <small className="text-muted" style={{ fontSize: '0.9rem' }}>Showing {courses.length} of {courses.length} results</small>
           </div>
 
           {courses.length > 0 ? (
             <Row className="g-4">
               {courses.map(course => (
-                <Col key={course.id} xs={12} sm={6} xl={4}>
-                  <Card className="h-100" style={{ borderRadius: '12px', border: '1px solid #eaeaea', transition: 'all 0.3s ease', overflow: 'hidden' }}>
+                <Col key={course.id} xs={4} sm={6} md={4} lg={4}>
+                  <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                    {/* Thumbnail – hidden on extra-small screens */}
+                    <div className="d-none d-sm-block">
+                      {course.thumbnail ? (
+                        <Card.Img
+                          variant="top"
+                          src={course.thumbnail.startsWith('http') ? course.thumbnail : `http://127.0.0.1:8000${course.thumbnail}`}
+                          style={{ height: '160px', objectFit: 'cover' }}
+                          alt={course.title}
+                        />
+                      ) : (
+                        <div style={{ height: '160px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <i className="bi bi-image" style={{ color: '#cbd5e1', fontSize: '2rem' }}></i>
+                        </div>
+                      )}
+                    </div>
 
-                    {/* ⭐ ADDED THUMBNAIL HERE ⭐ */}
-                    {course.thumbnail ? (
-                      <Card.Img
-                        variant="top"
-                        src={course.thumbnail.startsWith('http') ? course.thumbnail : `http://127.0.0.1:8000${course.thumbnail}`}
-                        style={{ height: '180px', objectFit: 'cover' }}
-                        alt={course.title}
-                      />
-                    ) : (
-                      <div style={{ height: '180px', backgroundColor: '#e9ecef', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <i className="bi bi-image text-muted fs-1"></i>
-                      </div>
-                    )}
-
-                    <Card.Body style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                        <Badge style={{ backgroundColor: getDifficultyColor(course.difficulty), color: 'white', fontWeight: '500', padding: '0.4rem 0.75rem', borderRadius: '20px', textTransform: 'capitalize' }}>
+                    <Card.Body className="d-flex flex-column p-3 p-md-4 flex-grow-1">
+                      <div className="d-flex justify-content-between align-items-start mb-2">
+                        <Badge
+                          style={{
+                            backgroundColor: getDifficultyColor(course.difficulty),
+                            padding: '0.25rem 0.5rem', borderRadius: '4px',
+                            textTransform: 'capitalize', fontWeight: '500', fontSize: '0.7rem'
+                          }}
+                        >
                           {course.difficulty}
                         </Badge>
-                        <span style={{ fontWeight: '600', color: course.is_free ? '#10b981' : '#2c5282', fontSize: '0.9rem' }}>
-                          {course.is_free ? <><i className="bi bi-gift me-1"></i>Free</> : `$${course.price}`}
+                        <span className="fw-bold" style={{ color: course.is_free ? '#10b981' : 'var(--text-main)', fontSize: '0.8rem' }}>
+                          {course.is_free ? 'Free' : `$${course.price}`}
                         </span>
                       </div>
-                      <Card.Title className="h6 fw-semibold" style={{ marginBottom: '0.75rem', color: '#333', lineHeight: '1.4' }}>{course.title}</Card.Title>
-                      <Card.Text className="text-muted small" style={{ marginBottom: '1.5rem', flex: 1, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: '1.5' }}>
+
+                      <Card.Title className="h6 fw-bold mb-2 line-clamp-2 card-title-responsive">
+                        {course.title}
+                      </Card.Title>
+
+                      <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-3 card-desc-responsive">
                         {stripHtml(course.short_description)}
                       </Card.Text>
-                      <div style={{ marginTop: 'auto' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center' }}><i className="bi bi-clock" style={{ color: '#666', marginRight: '0.25rem' }}></i><small style={{ color: '#666' }}>{course.duration || 'Self-paced'}</small></div>
-                          {course.rating && <div style={{ display: 'flex', alignItems: 'center' }}><i className="bi bi-star-fill" style={{ color: '#f59e0b', marginRight: '0.25rem' }}></i><small style={{ color: '#666' }}>{course.rating}</small></div>}
-                        </div>
-                        <Button as={Link} to={`/course/${course.id}`} style={{ width: '100%', background: 'linear-gradient(135deg, #2c5282, #4a90e2)', border: 'none', borderRadius: '8px', padding: '0.75rem', fontWeight: '500', transition: 'all 0.3s ease' }}>
-                          <i className="bi bi-play-circle me-2"></i> Start Learning
-                        </Button>
-                      </div>
+
+                      <Button
+                        as={Link}
+                        to={`/course/${course.id}`}
+                        variant="outline-primary"
+                        className="mt-auto w-100 fw-bold rounded-3 btn-responsive"
+                        size="sm"
+                      >
+                        View Course
+                      </Button>
                     </Card.Body>
                   </Card>
                 </Col>
               ))}
             </Row>
           ) : (
-            <Card style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', border: 'none', borderRadius: '12px' }}>
-              <Card.Body className="text-center py-5">
-                <div style={{ marginBottom: '1.5rem' }}><i className="bi bi-search" style={{ fontSize: '4rem', color: '#ddd' }}></i></div>
-                <h4 className="mb-3" style={{ color: '#333' }}>No courses found</h4>
-                <p className="text-muted mb-4" style={{ maxWidth: '500px', margin: '0 auto' }}>{difficulty ? `No ${difficulty} level courses available in this category.` : 'No courses available in this category.'}</p>
-                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                  <Button variant="outline-primary" onClick={() => handleDifficultyClick('')} style={{ borderColor: '#4a90e2', color: '#4a90e2', borderRadius: '8px', padding: '0.5rem 1.5rem' }}>Show All Levels</Button>
-                  <Button variant="primary" as={Link} to="/courses" style={{ background: 'linear-gradient(135deg, #2c5282, #4a90e2)', border: 'none', borderRadius: '8px', padding: '0.5rem 1.5rem' }}>Browse All Courses</Button>
+            <Card className="modern-card border-0 text-center py-5">
+              <Card.Body>
+                <i className="bi bi-search display-1 text-light mb-4 d-block"></i>
+                <h4 className="fw-bold text-dark mb-3">No courses found</h4>
+                <p className="text-muted mb-4 mx-auto" style={{ maxWidth: '400px' }}>
+                  {difficulty ? `No ${difficulty} level courses available in this category right now.` : 'No courses available in this category.'}
+                </p>
+                <div className="d-flex gap-3 justify-content-center">
+                  {difficulty && <Button variant="outline-primary" onClick={() => handleDifficultyClick('')} className="px-4 py-2 fw-medium">Show All Levels</Button>}
+                  <Button as={Link} to="/courses" className="btn-primary px-4 py-2">Browse All Courses</Button>
                 </div>
               </Card.Body>
             </Card>
           )}
         </Col>
       </Row>
+
+      <style>{`
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .transition-hover {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .transition-hover:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+        }
+
+        /* Responsive card adjustments (same as other pages) */
+        @media (max-width: 576px) {
+          .card-title-responsive {
+            font-size: 0.85rem !important;
+          }
+          .card-desc-responsive {
+            font-size: 0.75rem !important;
+          }
+          .btn-responsive {
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.5rem !important;
+          }
+          .card-body {
+            padding: 0.75rem !important;
+          }
+        }
+
+        @media (min-width: 577px) and (max-width: 768px) {
+          .card-title-responsive {
+            font-size: 0.95rem !important;
+          }
+          .card-desc-responsive {
+            font-size: 0.8rem !important;
+          }
+          .btn-responsive {
+            font-size: 0.8rem !important;
+            padding: 0.4rem 0.75rem !important;
+          }
+        }
+      `}</style>
     </Container>
   );
 }

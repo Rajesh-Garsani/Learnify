@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from '../axiosConfig';
 
 function Signup() {
-  const [step, setStep] = useState(1); // Step 1: Request OTP, Step 2: Submit Full Form
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -23,7 +23,6 @@ function Signup() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Step 1: Send OTP to Email
   const handleRequestOTP = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -38,7 +37,7 @@ function Signup() {
     try {
       await axios.post('/api/auth/send-register-otp/', { email: formData.email });
       setSuccessMsg('An OTP has been sent to your email. Please check your inbox.');
-      setStep(2); // Move to full registration form
+      setStep(2);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to send OTP. This email might already be registered.');
     } finally {
@@ -46,7 +45,6 @@ function Signup() {
     }
   };
 
-  // Step 2: Final Registration Submit
   const handleFinalSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -63,8 +61,6 @@ function Signup() {
       navigate('/login', { state: { message: 'Account created successfully! Please log in.' } });
     } catch (err) {
       console.error(err);
-
-      // Extract detailed validation errors (like strong password rules)
       if (err.response?.data) {
         const errData = err.response.data;
         if (errData.password) setError(errData.password[0]);
@@ -86,88 +82,86 @@ function Signup() {
           <Card className="shadow-sm border-0" style={{ borderRadius: '16px' }}>
             <Card.Body className="p-4 p-md-5">
               <div className="text-center mb-4">
-                <h2 className="fw-bold">Create Account</h2>
-                <p className="text-muted">Join Learnify to start coding</p>
+                <h2 className="fw-bold fs-3 fs-md-2">Create Account</h2>
+                <p className="text-muted small mb-0">Join Learnify to start coding</p>
               </div>
 
-              {error && <Alert variant="danger" className="rounded-3">{error}</Alert>}
-              {successMsg && <Alert variant="success" className="rounded-3">{successMsg}</Alert>}
+              {error && <Alert variant="danger" className="rounded-3 small py-2">{error}</Alert>}
+              {successMsg && <Alert variant="success" className="rounded-3 small py-2">{successMsg}</Alert>}
 
-              {/* STEP 1: ONLY SHOW EMAIL */}
               {step === 1 && (
                 <Form onSubmit={handleRequestOTP}>
                   <Form.Group className="mb-4">
-                    <Form.Label className="fw-medium">Email Address</Form.Label>
+                    <Form.Label className="small fw-medium">Email Address</Form.Label>
                     <Form.Control
                       type="email"
                       name="email"
                       placeholder="Enter your email"
                       value={formData.email}
                       onChange={handleChange}
+                      className="form-control-sm"
                       required
                     />
                   </Form.Group>
-                  <Button variant="primary" type="submit" className="w-100 py-2 fw-medium" disabled={loading}>
-                    {loading ? 'Sending OTP...' : 'Send Verification OTP'}
-                  </Button>
+
+                  {/* MODIFIED: Centered and using nav-btn-responsive to match topic buttons */}
+                  <div className="text-center mt-4">
+                    <Button type="submit" className="btn-primary nav-btn-responsive fw-bold shadow-sm" disabled={loading}>
+                      {loading ? 'Sending OTP...' : 'Send Verification OTP'}
+                    </Button>
+                  </div>
                 </Form>
               )}
 
-              {/* STEP 2: SHOW FULL FORM (Needs OTP) */}
               {step === 2 && (
                 <Form onSubmit={handleFinalSubmit}>
-                  <Row>
-                    <Col md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label className="small fw-medium">First Name</Form.Label>
-                        <Form.Control type="text" name="first_name" value={formData.first_name} onChange={handleChange} required />
+                  <Row className="g-2">
+                    <Col xs={6}>
+                      <Form.Group className="mb-2">
+                        <Form.Label className="small fw-medium mb-1">First Name</Form.Label>
+                        <Form.Control type="text" name="first_name" value={formData.first_name} onChange={handleChange} className="form-control-sm" required />
                       </Form.Group>
                     </Col>
-                    <Col md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label className="small fw-medium">Last Name</Form.Label>
-                        <Form.Control type="text" name="last_name" value={formData.last_name} onChange={handleChange} required />
+                    <Col xs={6}>
+                      <Form.Group className="mb-2">
+                        <Form.Label className="small fw-medium mb-1">Last Name</Form.Label>
+                        <Form.Control type="text" name="last_name" value={formData.last_name} onChange={handleChange} className="form-control-sm" required />
                       </Form.Group>
                     </Col>
                   </Row>
 
-                  <Form.Group className="mb-3">
-                    <Form.Label className="small fw-medium text-muted">Email (Verified)</Form.Label>
-                    <Form.Control type="email" value={formData.email} disabled className="bg-light" />
+                  <Form.Group className="mb-2">
+                    <Form.Label className="small fw-medium text-muted mb-1">Email (Verified)</Form.Label>
+                    <Form.Control type="email" value={formData.email} disabled className="bg-light form-control-sm" />
                   </Form.Group>
 
-                  <Form.Group className="mb-3">
-                    <Form.Label className="small fw-medium">6-Digit OTP Code</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="otp"
-                      placeholder="Enter code from email"
-                      value={formData.otp}
-                      onChange={handleChange}
-                      maxLength="6"
-                      required
-                    />
+                  <Form.Group className="mb-2">
+                    <Form.Label className="small fw-medium mb-1">6-Digit OTP Code</Form.Label>
+                    <Form.Control type="text" name="otp" placeholder="Enter code" value={formData.otp} onChange={handleChange} maxLength="6" className="form-control-sm" required />
                   </Form.Group>
 
-                  <Form.Group className="mb-3">
-                    <Form.Label className="small fw-medium">Password</Form.Label>
-                    <Form.Control type="password" name="password" value={formData.password} onChange={handleChange} required />
-                    <Form.Text className="text-muted" style={{ fontSize: '0.75rem' }}>
-                      Min 8 chars, 1 uppercase, 1 number, 1 special character.
+                  <Form.Group className="mb-2">
+                    <Form.Label className="small fw-medium mb-1">Password</Form.Label>
+                    <Form.Control type="password" name="password" value={formData.password} onChange={handleChange} className="form-control-sm" required />
+                    <Form.Text className="text-muted" style={{ fontSize: '0.7rem' }}>
+                      Min 8 chars, 1 uppercase, 1 number, 1 special.
                     </Form.Text>
                   </Form.Group>
 
                   <Form.Group className="mb-4">
-                    <Form.Label className="small fw-medium">Confirm Password</Form.Label>
-                    <Form.Control type="password" name="password2" value={formData.password2} onChange={handleChange} required />
+                    <Form.Label className="small fw-medium mb-1">Confirm Password</Form.Label>
+                    <Form.Control type="password" name="password2" value={formData.password2} onChange={handleChange} className="form-control-sm" required />
                   </Form.Group>
 
-                  <Button variant="success" type="submit" className="w-100 py-2 fw-medium" disabled={loading}>
-                    {loading ? 'Verifying & Creating...' : 'Complete Registration'}
-                  </Button>
+                  {/* MODIFIED: Centered and using nav-btn-responsive */}
+                  <div className="text-center mt-4">
+                    <Button type="submit" className="nav-btn-responsive fw-bold text-white shadow-sm" disabled={loading} style={{ background: 'linear-gradient(135deg, #10b981, #34d399)', border: 'none' }}>
+                      {loading ? 'Verifying & Creating...' : 'Complete Registration'}
+                    </Button>
+                  </div>
 
                   <div className="text-center mt-3">
-                     <Button variant="link" className="text-muted small p-0" onClick={() => {setStep(1); setSuccessMsg('');}}>
+                     <Button variant="link" className="text-muted small p-0 text-decoration-none" onClick={() => {setStep(1); setSuccessMsg('');}}>
                         Use a different email
                      </Button>
                   </div>
@@ -176,7 +170,7 @@ function Signup() {
 
               <div className="text-center mt-4 pt-3 border-top">
                 <p className="text-muted small mb-0">
-                  Already have an account? <Link to="/login" className="fw-medium text-primary text-decoration-none">Login here</Link>
+                  Already have an account? <Link to="/login" className="fw-medium text-decoration-none" style={{ color: 'var(--brand-primary)' }}>Login here</Link>
                 </p>
               </div>
             </Card.Body>

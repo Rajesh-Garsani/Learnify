@@ -65,7 +65,6 @@ function SearchPage() {
     }
   };
 
-  // ⭐ FIX: Helper to strip HTML tags for search result snippets
   const stripHtml = (html) => {
     if (!html) return '';
     const tmp = document.createElement("DIV");
@@ -118,8 +117,27 @@ function SearchPage() {
 
   return (
     <Container className="search-page py-5">
+      {/* Search Input */}
+      <div className="mb-4">
+        <Form onSubmit={handleSearch}>
+          <InputGroup size="lg" className="shadow-sm rounded-3 overflow-hidden">
+            <Form.Control
+              id="main-search-input"
+              type="search"
+              placeholder="Search for courses, topics, categories..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyPress={handleKeyPress}
+              className="shadow-none border-0"
+            />
+            <Button variant="primary" type="submit" className="px-4">
+              <i className="bi bi-search me-1"></i> Search
+            </Button>
+          </InputGroup>
+        </Form>
+      </div>
 
-
+      {/* Filters */}
       <div className="search-filters mb-4">
         <div className="d-flex flex-wrap gap-2">
           {filters.map(filter => (
@@ -128,7 +146,7 @@ function SearchPage() {
               variant={activeFilter === filter.key ? "primary" : "outline-secondary"}
               size="sm"
               onClick={() => setActiveFilter(filter.key)}
-              className="d-flex align-items-center"
+              className="d-flex align-items-center rounded-pill px-3"
             >
               <i className={`bi ${filter.icon} me-1`}></i>
               {filter.label}
@@ -137,6 +155,7 @@ function SearchPage() {
         </div>
       </div>
 
+      {/* Results */}
       <div className="search-results">
         {loading ? (
           <div className="text-center py-5">
@@ -148,41 +167,46 @@ function SearchPage() {
         ) : hasSearched ? (
           <>
             <div className="results-count mb-4">
-              <h5>
+              <h5 className="fw-bold">
                 Found {filteredResults.length} result{filteredResults.length !== 1 ? 's' : ''}
                 {query && ` for "${query}"`}
               </h5>
             </div>
 
             {filteredResults.length > 0 ? (
-              <Row xs={1} md={2} lg={3} className="g-4">
+              <Row xs={4} sm={6} md={4} lg={3} className="g-2 g-md-3 g-lg-4">
                 {filteredResults.map((item, index) => (
                   <Col key={`${item.type}-${item.id}-${index}`}>
                     <Card
-                      className="h-100 search-result-card"
+                      className="h-100 shadow-sm border-0 transition-hover"
                       onClick={() => navigateToResult(item)}
+                      style={{ borderRadius: '12px', cursor: 'pointer', overflow: 'hidden' }}
                     >
-                      <Card.Body>
-                        <div className="d-flex align-items-start mb-3">
-                          <div className="search-result-icon me-3">
-                            <i className={`bi ${getIconForType(item.type)}`}></i>
+                      <Card.Body className="p-2 p-md-3 p-lg-4 d-flex flex-column gap-1 gap-md-2">
+                        {/* Icon: visible on all screens except extra-small (hidden via CSS) */}
+                        <div className="d-flex align-items-start">
+                          <div className="search-result-icon me-2 flex-shrink-0" style={{ marginTop: '2px' }}>
+                            <i className={`bi ${getIconForType(item.type)} fs-5 icon-responsive`} style={{ color: 'var(--brand-primary)' }}></i>
                           </div>
-                          <div>
-                            <span className={`badge bg-${getBadgeColor(item.type)} mb-2`}>
+                          <div className="flex-grow-1 min-width-0">
+                            <span className={`badge bg-${getBadgeColor(item.type)} mb-1 text-uppercase`} style={{ fontSize: '0.6rem', letterSpacing: '0.02em' }}>
                               {item.type}
                             </span>
-                            <Card.Title className="h6 mb-2">{item.title}</Card.Title>
+                            <Card.Title className="h6 fw-bold mb-1 line-clamp-2 card-title-responsive">
+                              {item.title}
+                            </Card.Title>
+                            {item.subtitle && (
+                              <Card.Subtitle className="text-muted small line-clamp-1 card-subtitle-responsive">
+                                {item.subtitle}
+                              </Card.Subtitle>
+                            )}
                           </div>
                         </div>
-                        {item.subtitle && (
-                          <Card.Subtitle className="mb-2 text-muted">
-                            {item.subtitle}
-                          </Card.Subtitle>
-                        )}
-                        {/* ⭐ FIX: Applied stripHtml so search snippets display cleanly */}
+
+                        {/* Snippet */}
                         {item.snippet && (
-                          <Card.Text className="text-muted small">
-                            {stripHtml(item.snippet).slice(0, 150)}...
+                          <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-0 card-desc-responsive">
+                            {stripHtml(item.snippet)}
                           </Card.Text>
                         )}
                       </Card.Body>
@@ -193,7 +217,7 @@ function SearchPage() {
             ) : (
               <div className="text-center py-5">
                 <div className="no-results-icon mb-3">
-                  <i className="bi bi-search"></i>
+                  <i className="bi bi-search display-1 text-light"></i>
                 </div>
                 <h4>No results found for "{query}"</h4>
                 <p className="text-muted">Try different keywords or check your spelling</p>
@@ -203,7 +227,7 @@ function SearchPage() {
         ) : (
           <div className="text-center py-5">
             <div className="initial-state-icon mb-3">
-              <i className="bi bi-search"></i>
+              <i className="bi bi-search display-1 text-light"></i>
             </div>
             <h4>Start Searching</h4>
             <p className="text-muted">Enter keywords to find courses, topics, and more</p>
@@ -216,6 +240,7 @@ function SearchPage() {
                     key={tag}
                     variant="outline-secondary"
                     size="sm"
+                    className="rounded-pill"
                     onClick={() => {
                       setQuery(tag);
                       performSearch(tag);
@@ -229,6 +254,101 @@ function SearchPage() {
           </div>
         )}
       </div>
+
+      <style>{`
+        .transition-hover {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .transition-hover:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+        }
+        .line-clamp-1 {
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          word-break: break-word;
+          overflow-wrap: break-word;
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          word-break: break-word;
+          overflow-wrap: break-word;
+        }
+        .min-width-0 {
+          min-width: 0;
+        }
+
+        /* Hide icon only on extra-small screens (≤575.98px) */
+        @media (max-width: 575.98px) {
+          .search-result-icon {
+            display: none !important;
+          }
+        }
+
+        /* Responsive typography and spacing */
+        @media (max-width: 576px) {
+          .card-title-responsive {
+            font-size: 0.85rem !important;
+          }
+          .card-desc-responsive {
+            font-size: 0.75rem !important;
+          }
+          .card-subtitle-responsive {
+            font-size: 0.7rem !important;
+          }
+          .icon-responsive {
+            font-size: 1.1rem !important;
+          }
+          .card-body {
+            padding: 0.75rem !important;
+          }
+          .search-result-icon {
+            margin-right: 0.5rem !important;
+          }
+        }
+        @media (max-width: 400px) {
+          .card-title-responsive {
+            font-size: 0.75rem !important;
+          }
+          .card-desc-responsive {
+            font-size: 0.65rem !important;
+          }
+          .card-subtitle-responsive {
+            font-size: 0.6rem !important;
+          }
+          .icon-responsive {
+            font-size: 0.9rem !important;
+          }
+          .card-body {
+            padding: 0.5rem !important;
+          }
+          .gap-1 {
+            gap: 0.25rem !important;
+          }
+          .badge {
+            font-size: 0.5rem !important;
+          }
+        }
+        @media (min-width: 577px) and (max-width: 768px) {
+          .card-title-responsive {
+            font-size: 0.95rem !important;
+          }
+          .card-desc-responsive {
+            font-size: 0.8rem !important;
+          }
+          .card-subtitle-responsive {
+            font-size: 0.75rem !important;
+          }
+          .icon-responsive {
+            font-size: 1.25rem !important;
+          }
+        }
+      `}</style>
     </Container>
   );
 }

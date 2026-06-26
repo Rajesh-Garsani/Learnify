@@ -18,12 +18,42 @@ body {
 }
 
 /* ===== Bootstrap overrides (keep your existing ones) ===== */
-.btn-primary { background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary)); border: none; border-radius: 8px; padding: 0.6rem 1.5rem; font-weight: 500; box-shadow: 0 4px 6px -1px rgba(13,148,136,0.2); transition: all 0.3s ease; }
-.btn-primary:hover { background: linear-gradient(135deg, #0f766e, #115e59); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(13,148,136,0.3); }
-.btn-outline-primary { color: var(--brand-primary); border-color: var(--brand-primary); border-radius: 8px; font-weight: 500; transition: all 0.3s ease; }
-.btn-outline-primary:hover { background-color: var(--brand-primary); color: white; transform: translateY(-2px); }
-.form-control, .form-select { border-radius: 8px; border: 1px solid #e2e8f0; padding: 0.6rem 1rem; transition: all 0.2s ease; }
-.form-control:focus, .form-select:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 4px rgba(13,148,136,0.15); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  font-weight: 500;
+  box-shadow: 0 4px 6px -1px rgba(13,148,136,0.2);
+  transition: all 0.3s ease;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0f766e, #115e59);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(13,148,136,0.3);
+}
+.btn-outline-primary {
+  color: var(--brand-primary);
+  border-color: var(--brand-primary);
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+.btn-outline-primary:hover {
+  background-color: var(--brand-primary);
+  color: white;
+  transform: translateY(-2px);
+}
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 0.6rem 1rem;
+  transition: all 0.2s ease;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 4px rgba(13,148,136,0.15);
+}
 
 /* ===== Glass Navbar ===== */
 .glass-navbar {
@@ -224,10 +254,33 @@ body {
   z-index: 1020;
 }
 
+/* ===== Topic Detail Responsive Navigation Buttons ===== */
+/* ===== Topic Detail Responsive Navigation Buttons ===== */
+.nav-btn-responsive {
+    /* Desktop default */
+    padding: 0.6rem 1.5rem !important;
+    font-size: 0.95rem;
+    min-width: 130px;
+}
+
+/* Mobile specific styling */
+@media (max-width: 767px) {
+    .nav-btn-responsive {
+        min-width: 0; /* Remove min-width to allow shrinking */
+        width: auto !important; /* Allow buttons to size to their content */
+        padding: 0.5rem 1rem !important; /* Smaller padding */
+        font-size: 0.85rem !important; /* Smaller text */
+        margin-bottom: 0 !important; /* Remove bottom margin so they stay inline */
+    }
+}
+
 /* ===== Mobile adjustments ===== */
 @media (max-width: 991.98px) {
   .search-form { max-width: 180px; }
 }
+
+
+
 
 /* ===== Custom scrollbar (global) ===== */
 ::-webkit-scrollbar { width: 8px; }

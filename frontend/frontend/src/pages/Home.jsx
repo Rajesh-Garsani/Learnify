@@ -23,12 +23,11 @@ function Home() {
       const courseRes = await axios.get('/api/courses/recommendations/');
       setSectionTitle(courseRes.data.title || "Featured Courses");
       const coursesData = courseRes.data.results || courseRes.data;
-      setCourses(Array.isArray(coursesData) ? coursesData : []);
+      setCourses(Array.isArray(coursesData) ? coursesData.slice(0, 6) : []);
 
       const catRes = await axios.get('/api/categories/');
       const categoriesData = catRes.data.results || catRes.data;
-      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
-
+      setCategories(Array.isArray(categoriesData) ? categoriesData.slice(0, 6) : []);
     } catch (error) {
       console.error('Error fetching home content:', error);
       setError('Failed to load courses. Please check your connection.');
@@ -59,16 +58,16 @@ function Home() {
   return (
     <Container className="my-5">
       {/* Hero Section */}
-      <div className="container text-center mt-5">
-        <h1 className="display-4 fw-bold mb-3 text-animate">
+      <div className="container text-center mt-5 mb-4">
+        <h1 className="display-4 fw-bold mb-3 text-animate" style={{ color: 'var(--brand-primary)' }}>
           Learn To Code
         </h1>
-         <p className="lead">Build What You Think!</p>
-     </div>
+        <p className="lead text-muted">Build What You Think!</p>
+      </div>
 
       {/* Carousel */}
-      <div className="container mt-4 d-flex justify-content-center">
-        <div className="card shadow-lg" style={{ width: "90%", borderRadius: "20px", overflow: "hidden" }}>
+      <div className="container mt-4 d-flex justify-content-center mb-5">
+        <div className="card shadow-lg" style={{ width: "100%", maxWidth: "900px", borderRadius: "20px", overflow: "hidden", border: 'none' }}>
           <div className="card-body p-0">
             <div id="homeCarousel" className="carousel slide" data-bs-ride="carousel">
               <div className="carousel-indicators">
@@ -78,13 +77,13 @@ function Home() {
               </div>
               <div className="carousel-inner">
                 <div className="carousel-item active">
-                  <img src="/images/1.jpg" className="d-block w-100" style={{ height: "40vh", width: "100%", objectFit: "cover", borderRadius: "15px 15px 0 0" }} alt="Slide 1" />
+                  <img src="/images/1.jpg" className="d-block w-100" style={{ height: "40vh", minHeight: "300px", width: "100%", objectFit: "cover" }} alt="Slide 1" />
                 </div>
                 <div className="carousel-item">
-                  <img src="/images/2.png" className="d-block w-100" style={{ height: "40vh", objectFit: "cover", borderRadius: "15px 15px 0 0" }} alt="Slide 2" />
+                  <img src="/images/2.png" className="d-block w-100" style={{ height: "40vh", minHeight: "300px", objectFit: "cover" }} alt="Slide 2" />
                 </div>
                 <div className="carousel-item">
-                  <img src="/images/3.jpg" className="d-block w-100" style={{ height: "40vh", objectFit: "cover", borderRadius: "15px 15px 0 0" }} alt="Slide 3" />
+                  <img src="/images/3.jpg" className="d-block w-100" style={{ height: "40vh", minHeight: "300px", objectFit: "cover" }} alt="Slide 3" />
                 </div>
               </div>
               <button className="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
@@ -100,109 +99,169 @@ function Home() {
 
       {error && <Alert variant="danger">{error}</Alert>}
 
-      <Row className="mb-5 mt-5">
-        <Col>
-          <h2 className="mb-4">{sectionTitle}</h2>
-        </Col>
-      </Row>
+      {/* =========================================
+          COURSES SECTION (3 per row on mobile)
+          ========================================= */}
+      <div className="d-flex justify-content-between align-items-center mb-4 mt-5">
+        <h3 className="fw-bold m-0 text-dark">{sectionTitle}</h3>
+        <Link to="/courses" className="text-decoration-none fw-semibold" style={{ color: 'var(--brand-primary)' }}>
+          View All <i className="bi bi-arrow-right"></i>
+        </Link>
+      </div>
 
-      {/* Course Cards */}
-      <Row>
+      <Row className="g-4 mb-5">
         {courses && courses.length > 0 ? (
           courses.map(course => (
-            <Col key={course.id} xs={12} sm={6} lg={4} className="mb-4">
-              <Card className="h-100 course-card shadow-sm">
+            <Col key={course.id} xs={4} sm={6} md={4}>
+              <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                {/* Hide thumbnail on extra-small mobile screens */}
+                <div className="d-none d-sm-block">
+                  {course.thumbnail ? (
+                    <Card.Img
+                      variant="top"
+                      src={course.thumbnail.startsWith('http') ? course.thumbnail : `http://127.0.0.1:8000${course.thumbnail}`}
+                      style={{ height: '160px', objectFit: 'cover' }}
+                      alt={course.title}
+                    />
+                  ) : (
+                    <div style={{ height: '160px', backgroundColor: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <i className="bi bi-image text-muted fs-1"></i>
+                    </div>
+                  )}
+                </div>
 
-                {/* ⭐ ADDED THUMBNAIL HERE ⭐ */}
-                {course.thumbnail ? (
-                  <Card.Img
-                    variant="top"
-                    src={course.thumbnail.startsWith('http') ? course.thumbnail : `http://127.0.0.1:8000${course.thumbnail}`}
-                    style={{ height: '200px', objectFit: 'cover' }}
-                    alt={course.title}
-                  />
-                ) : (
-                  <div style={{ height: '200px', backgroundColor: '#e9ecef', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <i className="bi bi-image text-muted fs-1"></i>
+                <Card.Body className="d-flex flex-column p-3 p-md-4 flex-grow-1">
+                  <div className="d-flex justify-content-between align-items-start mb-2">
+                    <span className="badge bg-light text-dark border text-capitalize px-2 py-1">
+                      {course.difficulty}
+                    </span>
+                    <span className="fw-bold" style={{ color: course.is_free ? '#10b981' : 'var(--text-main)', fontSize: '0.9rem' }}>
+                      {course.is_free ? 'Free' : `$${course.price}`}
+                    </span>
                   </div>
-                )}
 
-                <Card.Body className="d-flex flex-column">
-                  <Card.Title className="h6">{course.title}</Card.Title>
-                  <Card.Text className="text-muted small flex-grow-1" style={{
-                    display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden'
-                  }}>
+                  <Card.Title className="h6 fw-bold mb-2 line-clamp-2 card-title-responsive">{course.title}</Card.Title>
+
+                  <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-3 card-desc-responsive">
                     {stripHtml(course.short_description)}
                   </Card.Text>
-                  <div className="mt-auto">
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                      <span className={`badge ${
-                        course.difficulty === 'beginner' ? 'bg-success' :
-                        course.difficulty === 'intermediate' ? 'bg-warning' : 'bg-danger'
-                      } text-capitalize`}>
-                        {course.difficulty}
-                      </span>
-                      <small className="text-muted">
-                        {course.is_free ? 'Free' : `$${course.price}`}
-                      </small>
-                    </div>
-                    <Link to={`/course/${course.id}`} className="btn btn-primary btn-sm w-100">
-                      View Course
-                    </Link>
-                  </div>
+
+                  <Link to={`/course/${course.id}`} className="btn btn-outline-primary btn-sm w-100 fw-bold mt-auto rounded-3 btn-responsive">
+                    View Course
+                  </Link>
                 </Card.Body>
               </Card>
             </Col>
           ))
         ) : (
           <Col>
-            <div className="text-center py-5">
-              <i className="bi bi-book fa-3x text-muted mb-3"></i>
-              <h4>No courses available</h4>
-              <p className="text-muted">Check back later for new courses.</p>
+            <div className="text-center py-5 bg-white rounded-3 shadow-sm">
+              <i className="bi bi-journal-x display-4 text-muted mb-3 d-block"></i>
+              <h5>No courses available</h5>
+              <p className="text-muted mb-0">Check back later for new courses.</p>
             </div>
           </Col>
         )}
       </Row>
 
-      {/* Categories Section */}
-      <Row className="mt-5">
-        <Col>
-          <h2 className="mb-4">Browse by Category</h2>
-          <Row>
-            {categories && categories.length > 0 ? (
-              categories.map(category => (
-                <Col key={category.id} md={4} className="mb-3">
-                  <Card className="text-center h-100">
-                    <Card.Body className="d-flex flex-column">
-                      <i className="bi bi-file-code-fill fs-1 text-primary mb-3"></i>
-                      <Card.Title>{category.name}</Card.Title>
-                      <Card.Text className="flex-grow-1" style={{
-                        display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden'
-                      }}>
-                        {stripHtml(category.description) || `Explore ${category.name} courses`}
-                      </Card.Text>
-                      <Button
-                        as={Link}
-                        to={`/category/${category.id}`}
-                        variant="outline-primary"
-                      >
-                        Explore
-                      </Button>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              ))
-            ) : (
-              <Col>
-                <div className="text-center py-3">
-                  <p className="text-muted">No categories available</p>
-                </div>
-              </Col>
-            )}
-          </Row>
-        </Col>
+
+      {/* =========================================
+          CATEGORIES SECTION (3 per row on mobile)
+          ========================================= */}
+      <div className="d-flex justify-content-between align-items-center mb-4 mt-5">
+        <h3 className="fw-bold m-0 text-dark">Browse by Category</h3>
+        <Link to="/categories" className="text-decoration-none fw-semibold" style={{ color: 'var(--brand-primary)' }}>
+          View All <i className="bi bi-arrow-right"></i>
+        </Link>
+      </div>
+
+      <Row className="g-4 mb-5">
+        {categories && categories.length > 0 ? (
+          categories.map(category => (
+            <Col key={category.id} xs={4} sm={6} md={4}>
+              <Card className="text-center h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px' }}>
+                <Card.Body className="d-flex flex-column p-4 flex-grow-1">
+                  <div className="mb-3">
+                    <div style={{
+                      width: '60px', height: '60px', margin: '0 auto',
+                      background: 'rgba(13, 148, 136, 0.1)', borderRadius: '50%',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                      <i className="bi bi-grid-fill fs-3" style={{ color: 'var(--brand-primary)' }}></i>
+                    </div>
+                  </div>
+                  <Card.Title className="fw-bold h5 mb-2 card-title-responsive">{category.name}</Card.Title>
+                  <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-4 card-desc-responsive">
+                    {stripHtml(category.description) || `Explore all courses related to ${category.name}.`}
+                  </Card.Text>
+                  <Button
+                    as={Link}
+                    to={`/category/${category.id}`}
+                    className="btn btn-light w-100 fw-bold border mt-auto rounded-3 btn-responsive"
+                    style={{ color: '#ffffff' }}
+                  >
+                    Explore
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))
+        ) : (
+          <Col>
+            <div className="text-center py-5 bg-white rounded-3 shadow-sm">
+              <i className="bi bi-folder-x display-4 text-muted mb-3 d-block"></i>
+              <h5>No categories available</h5>
+            </div>
+          </Col>
+        )}
       </Row>
+
+      {/* Inline styles for card responsiveness and hover effects */}
+      <style>{`
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .transition-hover {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .transition-hover:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+        }
+
+        /* --- Responsive card adjustments --- */
+        @media (max-width: 576px) {
+          .card-title-responsive {
+            font-size: 0.85rem !important;  /* smaller title on mobile */
+          }
+          .card-desc-responsive {
+            font-size: 0.75rem !important;  /* smaller description */
+          }
+          .btn-responsive {
+            font-size: 0.75rem !important;  /* smaller button text */
+            padding: 0.3rem 0.5rem !important;
+          }
+          .card-body {
+            padding: 0.75rem !important;    /* less padding on mobile */
+          }
+        }
+
+        @media (min-width: 577px) and (max-width: 768px) {
+          .card-title-responsive {
+            font-size: 0.95rem !important;
+          }
+          .card-desc-responsive {
+            font-size: 0.8rem !important;
+          }
+          .btn-responsive {
+            font-size: 0.8rem !important;
+            padding: 0.4rem 0.75rem !important;
+          }
+        }
+      `}</style>
     </Container>
   );
 }
