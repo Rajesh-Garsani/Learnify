@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Navbar as BootstrapNavbar, Container, Nav, NavDropdown, Button, Form, InputGroup } from 'react-bootstrap';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../axiosConfig';
 import '../index.css';
 
 function Navbar() {
@@ -121,7 +121,7 @@ function Navbar() {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:8000/api/categories/');
+      const res = await api.get('/api/categories/');
       setCategories(universalArray(res.data));
     } catch {
       setCategories([]);
@@ -130,7 +130,7 @@ function Navbar() {
 
   const fetchCourses = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:8000/api/courses/');
+      const res = await api.get('/api/courses/');
       setCourses(universalArray(res.data));
     } catch {
       setCourses([]);
