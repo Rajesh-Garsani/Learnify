@@ -11,6 +11,8 @@ function SubCategoryPage() {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [courses, setCourses] = useState([]);
+  const [nextUrl, setNextUrl] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [difficulty, setDifficulty] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -23,20 +25,49 @@ function SubCategoryPage() {
 
   const fetchCourses = async (subcatId, level = difficulty, sort = sortBy) => {
     setLoading(true);
+    setCourses([]);
+    setNextUrl(null);
     try {
-      let url = `/api/courses/?subcategory=${subcatId}`;
+      let url = `/api/courses/?subcategory=${subcatId}&page_size=100`;
       if (level) url += `&difficulty=${level}`;
       if (sort === 'newest') url += '&ordering=-created_at';
       if (sort === 'rating') url += '&ordering=-rating';
 
       const res = await axios.get(url);
-      const data = res.data.results || res.data;
-      setCourses(Array.isArray(data) ? data : []);
+      const data = res.data;
+
+      if (Array.isArray(data)) {
+        setCourses(data);
+        setNextUrl(null);
+      } else {
+        setCourses(data.results || []);
+        setNextUrl(data.next || null);
+      }
     } catch (err) {
       console.error("Error fetching courses:", err);
       setCourses([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMoreCourses = async () => {
+    if (!nextUrl || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const res = await axios.get(nextUrl);
+      const data = res.data;
+      if (Array.isArray(data)) {
+        setCourses(prev => [...prev, ...data]);
+        setNextUrl(null);
+      } else {
+        setCourses(prev => [...prev, ...(data.results || [])]);
+        setNextUrl(data.next || null);
+      }
+    } catch (err) {
+      console.error("Load more error:", err);
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -68,12 +99,12 @@ function SubCategoryPage() {
         fetchCourses(subcatList[0].id, difficulty, sortBy);
       } else {
         setError("No subcategories found");
+        setLoading(false);
       }
 
     } catch (err) {
       console.error("Error fetching subcategory data:", err);
       setError("Failed to load category data");
-    } finally {
       setLoading(false);
     }
   };
@@ -142,13 +173,17 @@ function SubCategoryPage() {
   return (
     <Container className="mt-4 pb-5">
       <Breadcrumb className="mb-4 small fw-medium">
-        <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/" }} className="text-muted"><i className="bi bi-house me-1"></i> Home</Breadcrumb.Item>
+        <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/" }} className="text-muted">
+          <i className="bi bi-house me-1"></i> Home
+        </Breadcrumb.Item>
         {selectedSubcategory?.category_name && (
           <Breadcrumb.Item linkAs={Link} linkProps={{ to: `/category/${selectedSubcategory.category}` }} className="text-muted">
             {selectedSubcategory.category_name}
           </Breadcrumb.Item>
         )}
-        <Breadcrumb.Item active style={{ color: 'var(--brand-primary)' }}>{selectedSubcategory?.name}</Breadcrumb.Item>
+        <Breadcrumb.Item active style={{ color: 'var(--brand-primary)' }}>
+          {selectedSubcategory?.name}
+        </Breadcrumb.Item>
       </Breadcrumb>
 
       <Row className="mb-5">
@@ -163,7 +198,8 @@ function SubCategoryPage() {
               )}
               <div className="d-flex gap-2">
                 <Badge bg="white" text="dark" className="border px-3 py-2 rounded-pill fw-medium shadow-sm">
-                  <i className="bi bi-book text-primary me-2"></i>{courses.length} {courses.length === 1 ? 'Course' : 'Courses'}
+                  <i className="bi bi-book text-primary me-2"></i>
+                  {courses.length}{nextUrl ? '+' : ''} {courses.length === 1 ? 'Course' : 'Courses'}
                 </Badge>
                 <Badge bg="white" text="dark" className="border px-3 py-2 rounded-pill fw-medium shadow-sm">
                   <i className="bi bi-tags text-primary me-2"></i>{subcategories.length} Subcategories
@@ -185,7 +221,6 @@ function SubCategoryPage() {
       {/* ===== MOBILE FILTER BAR (sticky, hidden on lg) ===== */}
       <div className="bg-white p-2 rounded-4 shadow-sm mb-3 d-lg-none sticky-top" style={{ zIndex: 1030, top: '0' }}>
         <div className="d-flex flex-nowrap gap-2 align-items-center">
-          {/* Subcategory selector – dropdown on mobile */}
           <div className="flex-grow-1" style={{ minWidth: 0 }}>
             <Form.Select
               value={selectedSubcategory?.id || ''}
@@ -204,7 +239,6 @@ function SubCategoryPage() {
             </Form.Select>
           </div>
 
-          {/* Difficulty dropdown */}
           <div className="flex-grow-1" style={{ minWidth: 0 }}>
             <Form.Select
               value={difficulty}
@@ -220,7 +254,6 @@ function SubCategoryPage() {
             </Form.Select>
           </div>
 
-          {/* Search input – smaller */}
           <div className="flex-grow-1" style={{ minWidth: 0 }}>
             <Form onSubmit={handleSearch} className="d-flex">
               <Form.Control
@@ -241,14 +274,22 @@ function SubCategoryPage() {
       </div>
 
       <Row>
-        {/* SIDEBAR FILTERS – visible only on lg+ */}
+        {/* SIDEBAR – visible only on lg+ */}
         <Col lg={3} className="d-none d-lg-block mb-4">
           <Card className="modern-card mb-4 border-0">
             <Card.Body className="p-3">
               <Form onSubmit={handleSearch}>
                 <InputGroup>
-                  <Form.Control type="search" placeholder="Search in category..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="border-end-0 shadow-none bg-light" />
-                  <Button variant="light" type="submit" className="border border-start-0 text-muted"><i className="bi bi-search"></i></Button>
+                  <Form.Control
+                    type="search"
+                    placeholder="Search in category..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="border-end-0 shadow-none bg-light"
+                  />
+                  <Button variant="light" type="submit" className="border border-start-0 text-muted">
+                    <i className="bi bi-search"></i>
+                  </Button>
                 </InputGroup>
               </Form>
             </Card.Body>
@@ -256,15 +297,24 @@ function SubCategoryPage() {
 
           <Card className="modern-card mb-4 border-0">
             <Card.Header className="bg-white border-bottom p-3">
-              <h6 className="mb-0 fw-bold"><i className="bi bi-grid-fill me-2" style={{ color: 'var(--brand-primary)' }}></i> Select Topic</h6>
+              <h6 className="mb-0 fw-bold">
+                <i className="bi bi-grid-fill me-2" style={{ color: 'var(--brand-primary)' }}></i> Select Topic
+              </h6>
             </Card.Header>
             <ListGroup variant="flush" className="p-2">
               {subcategories.map(sc => {
                 const isActive = selectedSubcategory?.id === sc.id;
                 return (
-                  <ListGroup.Item key={sc.id} action onClick={() => handleSubcategoryClick(sc)}
+                  <ListGroup.Item
+                    key={sc.id}
+                    action
+                    onClick={() => handleSubcategoryClick(sc)}
                     className="border-0 rounded-3 mb-1 d-flex align-items-center transition-all fw-medium"
-                    style={{ background: isActive ? 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' : 'transparent', color: isActive ? 'white' : 'var(--text-muted)' }}>
+                    style={{
+                      background: isActive ? 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' : 'transparent',
+                      color: isActive ? 'white' : 'var(--text-muted)'
+                    }}
+                  >
                     <div className="d-flex align-items-center flex-grow-1">
                       <div style={{ width: '4px', height: '16px', background: isActive ? 'white' : '#e2e8f0', borderRadius: '2px', marginRight: '0.75rem' }}></div>
                       {sc.name}
@@ -278,7 +328,9 @@ function SubCategoryPage() {
 
           <Card className="modern-card mb-4 border-0">
             <Card.Header className="bg-white border-bottom p-3">
-              <h6 className="mb-0 fw-bold"><i className="bi bi-filter-circle-fill me-2" style={{ color: 'var(--brand-primary)' }}></i> Filter by Level</h6>
+              <h6 className="mb-0 fw-bold">
+                <i className="bi bi-filter-circle-fill me-2" style={{ color: 'var(--brand-primary)' }}></i> Filter by Level
+              </h6>
             </Card.Header>
             <ListGroup variant="flush" className="p-2">
               {[
@@ -289,9 +341,16 @@ function SubCategoryPage() {
               ].map(level => {
                 const isActive = difficulty === level.value;
                 return (
-                  <ListGroup.Item key={level.value} action onClick={() => handleDifficultyClick(level.value)}
+                  <ListGroup.Item
+                    key={level.value}
+                    action
+                    onClick={() => handleDifficultyClick(level.value)}
                     className="border-0 rounded-3 mb-1 d-flex align-items-center transition-all fw-medium"
-                    style={{ background: isActive ? 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' : 'transparent', color: isActive ? 'white' : 'var(--text-muted)' }}>
+                    style={{
+                      background: isActive ? 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' : 'transparent',
+                      color: isActive ? 'white' : 'var(--text-muted)'
+                    }}
+                  >
                     <i className={`bi ${level.icon} me-3`}></i>{level.label}
                   </ListGroup.Item>
                 );
@@ -304,81 +363,115 @@ function SubCategoryPage() {
         <Col lg={9}>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h5 className="mb-0 fw-bold text-dark">
-              {courses.length} {courses.length === 1 ? 'Course' : 'Courses'}
-              {difficulty && <span className="text-muted fw-normal ms-2">- {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</span>}
+              {courses.length}{nextUrl ? '+' : ''} {courses.length === 1 ? 'Course' : 'Courses'}
+              {difficulty && (
+                <span className="text-muted fw-normal ms-2">
+                  - {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+                </span>
+              )}
             </h5>
           </div>
 
           {courses.length > 0 ? (
-            <Row className="g-4">
-              {courses.map(course => (
-                <Col key={course.id} xs={4} sm={6} md={4} lg={4}>
-                  <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
-                    {/* Thumbnail – hidden on extra-small screens */}
-                    <div className="d-none d-sm-block">
-                      {course.thumbnail ? (
-                        <Card.Img
-                          variant="top"
-                          src={course.thumbnail.startsWith('http') ? course.thumbnail : `http://127.0.0.1:8000${course.thumbnail}`}
-                          style={{ height: '160px', objectFit: 'cover' }}
-                          alt={course.title}
-                        />
-                      ) : (
-                        <div style={{ height: '160px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <i className="bi bi-image" style={{ color: '#cbd5e1', fontSize: '2rem' }}></i>
-                        </div>
-                      )}
-                    </div>
-
-                    <Card.Body className="d-flex flex-column p-3 p-md-4 flex-grow-1">
-                      <div className="d-flex justify-content-between align-items-start mb-2">
-                        <Badge
-                          style={{
-                            backgroundColor: getDifficultyColor(course.difficulty),
-                            padding: '0.25rem 0.5rem', borderRadius: '4px',
-                            textTransform: 'capitalize', fontWeight: '500', fontSize: '0.7rem'
-                          }}
-                        >
-                          {course.difficulty}
-                        </Badge>
-                        <span className="fw-bold" style={{ color: course.is_free ? '#10b981' : 'var(--text-main)', fontSize: '0.8rem' }}>
-                          {course.is_free ? 'Free' : `$${course.price}`}
-                        </span>
+            <>
+              {/* FIX: xs={6} on Col = 2 cards per row on mobile (50% width each).
+                  sm={6} keeps 2-per-row on small tablets, md={4} gives 3-per-row on medium+.
+                  Previously xs={4} forced 3 cards into ~125px each on a 375px screen. */}
+              <Row className="g-3 g-md-4">
+                {courses.map(course => (
+                  <Col key={course.id} xs={6} sm={6} md={4}>
+                    <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                      <div className="d-none d-sm-block">
+                        {course.thumbnail ? (
+                          <Card.Img
+                            variant="top"
+                            src={course.thumbnail.startsWith('http') ? course.thumbnail : `http://127.0.0.1:8000${course.thumbnail}`}
+                            style={{ height: '160px', objectFit: 'cover' }}
+                            alt={course.title}
+                          />
+                        ) : (
+                          <div style={{ height: '160px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="bi bi-image" style={{ color: '#cbd5e1', fontSize: '2rem' }}></i>
+                          </div>
+                        )}
                       </div>
 
-                      <Card.Title className="h6 fw-bold mb-2 line-clamp-2 card-title-responsive">
-                        {course.title}
-                      </Card.Title>
+                      <Card.Body className="d-flex flex-column p-2 p-sm-3 p-md-4 flex-grow-1">
+                        <div className="d-flex justify-content-between align-items-start mb-2">
+                          <Badge
+                            style={{
+                              backgroundColor: getDifficultyColor(course.difficulty),
+                              padding: '0.25rem 0.5rem', borderRadius: '4px',
+                              textTransform: 'capitalize', fontWeight: '500', fontSize: '0.65rem'
+                            }}
+                          >
+                            {course.difficulty}
+                          </Badge>
+                          <span className="fw-bold" style={{ color: course.is_free ? '#10b981' : 'var(--text-main)', fontSize: '0.75rem' }}>
+                            {course.is_free ? 'Free' : `$${course.price}`}
+                          </span>
+                        </div>
 
-                      <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-3 card-desc-responsive">
-                        {stripHtml(course.short_description)}
-                      </Card.Text>
+                        <Card.Title className="h6 fw-bold mb-1 line-clamp-2 card-title-responsive">
+                          {course.title}
+                        </Card.Title>
 
-                      <Button
-                        as={Link}
-                        to={`/course/${course.id}`}
-                        variant="outline-primary"
-                        className="mt-auto w-100 fw-bold rounded-3 btn-responsive"
-                        size="sm"
-                      >
-                        View Course
-                      </Button>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
+                        <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-2 card-desc-responsive">
+                          {stripHtml(course.short_description)}
+                        </Card.Text>
+
+                        <Button
+                          as={Link}
+                          to={`/course/${course.id}`}
+                          variant="outline-primary"
+                          className="mt-auto w-100 fw-bold rounded-3 btn-responsive"
+                          size="sm"
+                        >
+                          View Course
+                        </Button>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+
+              {/* Load More — only shown when backend has additional pages */}
+              {nextUrl && (
+                <div className="text-center mt-4">
+                  <Button
+                    variant="outline-primary"
+                    className="rounded-pill px-4"
+                    onClick={fetchMoreCourses}
+                    disabled={loadingMore}
+                  >
+                    {loadingMore ? (
+                      <><Spinner animation="border" size="sm" className="me-2" />Loading...</>
+                    ) : (
+                      'Load more courses'
+                    )}
+                  </Button>
+                </div>
+              )}
+            </>
           ) : (
             <Card className="modern-card border-0 text-center py-5">
               <Card.Body>
                 <i className="bi bi-search display-1 text-light mb-4 d-block"></i>
                 <h4 className="fw-bold text-dark mb-3">No courses found</h4>
                 <p className="text-muted mb-4 mx-auto" style={{ maxWidth: '400px' }}>
-                  {difficulty ? `No ${difficulty} level courses available in this category right now.` : 'No courses available in this category.'}
+                  {difficulty
+                    ? `No ${difficulty} level courses available in this category right now.`
+                    : 'No courses available in this category.'}
                 </p>
                 <div className="d-flex gap-3 justify-content-center">
-                  {difficulty && <Button variant="outline-primary" onClick={() => handleDifficultyClick('')} className="px-4 py-2 fw-medium">Show All Levels</Button>}
-                  <Button as={Link} to="/courses" className="btn-primary px-4 py-2">Browse All Courses</Button>
+                  {difficulty && (
+                    <Button variant="outline-primary" onClick={() => handleDifficultyClick('')} className="px-4 py-2 fw-medium">
+                      Show All Levels
+                    </Button>
+                  )}
+                  <Button as={Link} to="/courses" className="btn-primary px-4 py-2">
+                    Browse All Courses
+                  </Button>
                 </div>
               </Card.Body>
             </Card>
@@ -387,45 +480,21 @@ function SubCategoryPage() {
       </Row>
 
       <style>{`
-        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
         .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .transition-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .transition-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
 
-        .transition-hover {
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .transition-hover:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
-        }
-
-        /* Responsive card adjustments (same as other pages) */
         @media (max-width: 576px) {
-          .card-title-responsive {
-            font-size: 0.85rem !important;
-          }
-          .card-desc-responsive {
-            font-size: 0.75rem !important;
-          }
-          .btn-responsive {
-            font-size: 0.75rem !important;
-            padding: 0.3rem 0.5rem !important;
-          }
-          .card-body {
-            padding: 0.75rem !important;
-          }
+          .card-title-responsive { font-size: 0.8rem !important; line-height: 1.2 !important; }
+          .card-desc-responsive { font-size: 0.7rem !important; }
+          .btn-responsive { font-size: 0.7rem !important; padding: 0.2rem 0.4rem !important; }
         }
 
         @media (min-width: 577px) and (max-width: 768px) {
-          .card-title-responsive {
-            font-size: 0.95rem !important;
-          }
-          .card-desc-responsive {
-            font-size: 0.8rem !important;
-          }
-          .btn-responsive {
-            font-size: 0.8rem !important;
-            padding: 0.4rem 0.75rem !important;
-          }
+          .card-title-responsive { font-size: 0.9rem !important; }
+          .card-desc-responsive { font-size: 0.8rem !important; }
+          .btn-responsive { font-size: 0.8rem !important; padding: 0.4rem 0.75rem !important; }
         }
       `}</style>
     </Container>
