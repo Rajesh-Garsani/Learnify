@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Container, Row, Col, Card, Badge } from 'react-bootstrap';
 import queryString from "query-string";
 import axios from '../axiosConfig';
 
@@ -24,7 +25,7 @@ export default function SearchResults() {
     fetchResults(q, page);
   }, [q, page]);
 
-  const fetchResults = async (query, pageNum=1) => {
+  const fetchResults = async (query, pageNum = 1) => {
     try {
       const res = await axios.get(`/api/search/?q=${encodeURIComponent(query)}&page=${pageNum}&page_size=12`);
       setResults(res.data.results || []);
@@ -42,24 +43,56 @@ export default function SearchResults() {
     else if (r.type === "subcategory") navigate(`/subcategory/${r.id}`);
   };
 
-  return (
-    <div style={{ padding: 24 }}>
-      <h2>Search results for “{q}” ({count})</h2>
-      <div>
-        {results.length === 0 && <div>No results found.</div>}
-        {results.map((r) => (
-          <div key={`${r.type}-${r.id}`} style={{ padding: 12, borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => openResult(r)}>
-            <div style={{ fontWeight: 700 }}>{r.title} <small style={{ marginLeft: 8, fontWeight: 500 }}>{r.subtitle}</small></div>
-            <div style={{ color: "#666" }}>{r.snippet}</div>
-            <div style={{ fontSize: 12, color: "#888", marginTop: 6 }}>{r.type}</div>
-          </div>
-        ))}
-      </div>
+  const getBadgeColor = (type) => {
+    switch (type) {
+      case 'course': return 'primary';
+      case 'topic': return 'success';
+      case 'category': return 'warning';
+      case 'subcategory': return 'info';
+      default: return 'secondary';
+    }
+  };
 
-      <div style={{ marginTop: 18 }}>
-        {page > 1 && <button onClick={() => setPage(p => p - 1)}>Previous</button>}
-        {results.length > 0 && <button style={{ marginLeft: 8 }} onClick={() => setPage(p => p + 1)}>Next</button>}
+  return (
+    <Container className="py-4">
+      <h2 className="mb-4">Search results for “{q}” ({count})</h2>
+      {results.length === 0 && <div>No results found.</div>}
+      <Row xs={6} sm={6} md={4} lg={3} className="g-3">
+        {results.map((r) => (
+          <Col key={`${r.type}-${r.id}`}>
+            <Card
+              className="h-100 shadow-sm border-0 transition-hover"
+              onClick={() => openResult(r)}
+              style={{ borderRadius: '12px', cursor: 'pointer', overflow: 'hidden' }}
+            >
+              <Card.Body className="p-3">
+                <div className="d-flex flex-column gap-1">
+                  <Badge bg={getBadgeColor(r.type)} className="text-uppercase" style={{ fontSize: '0.6rem', alignSelf: 'flex-start' }}>
+                    {r.type}
+                  </Badge>
+                  <Card.Title className="fw-bold mb-1 line-clamp-2" style={{ fontSize: '0.9rem' }}>
+                    {r.title}
+                  </Card.Title>
+                  {r.subtitle && (
+                    <Card.Subtitle className="text-muted small line-clamp-1">
+                      {r.subtitle}
+                    </Card.Subtitle>
+                  )}
+                  {r.snippet && (
+                    <Card.Text className="text-muted small line-clamp-2 mb-0">
+                      {r.snippet}
+                    </Card.Text>
+                  )}
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+      <div className="d-flex gap-2 mt-4">
+        {page > 1 && <button className="btn btn-outline-primary" onClick={() => setPage(p => p - 1)}>Previous</button>}
+        {results.length > 0 && <button className="btn btn-outline-primary" onClick={() => setPage(p => p + 1)}>Next</button>}
       </div>
-    </div>
+    </Container>
   );
 }
