@@ -171,7 +171,7 @@ function SearchPage() {
             </div>
 
             {filteredResults.length > 0 ? (
-              <Row xs={6} sm={6} md={4} lg={3} className="g-2 g-md-3 g-lg-4">
+              <Row xs={6} sm={6} md={6} lg={3} className="g-2 g-md-3 g-lg-4">
                 {filteredResults.map((item, index) => (
                   <Col key={`${item.type}-${item.id}-${index}`}>
                     <Card
@@ -192,7 +192,7 @@ function SearchPage() {
                               {item.title}
                             </Card.Title>
                             {item.subtitle && (
-                              <Card.Subtitle className="text-muted small line-clamp-1 card-subtitle-responsive">
+                              <Card.Subtitle className="text-muted small line-clamp-1 card-subtitle-responsive" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {item.subtitle}
                               </Card.Subtitle>
                             )}
