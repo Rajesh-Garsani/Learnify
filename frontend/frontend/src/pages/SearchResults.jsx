@@ -65,25 +65,23 @@ export default function SearchResults() {
               onClick={() => openResult(r)}
               style={{ borderRadius: '12px', cursor: 'pointer', overflow: 'hidden' }}
             >
-              <Card.Body className="p-3">
-                <div className="d-flex flex-column gap-1">
-                  <Badge bg={getBadgeColor(r.type)} className="text-uppercase" style={{ fontSize: '0.6rem', alignSelf: 'flex-start' }}>
-                    {r.type}
-                  </Badge>
-                  <Card.Title className="fw-bold mb-1 line-clamp-2" style={{ fontSize: '0.9rem' }}>
-                    {r.title}
-                  </Card.Title>
-                  {r.subtitle && (
-                    <Card.Subtitle className="text-muted small line-clamp-1">
-                      {r.subtitle}
-                    </Card.Subtitle>
-                  )}
-                  {r.snippet && (
-                    <Card.Text className="text-muted small line-clamp-2 mb-0">
-                      {r.snippet}
-                    </Card.Text>
-                  )}
-                </div>
+              <Card.Body className="p-3 d-flex flex-column gap-1">
+                <Badge bg={getBadgeColor(r.type)} className="text-uppercase align-self-start" style={{ fontSize: '0.6rem' }}>
+                  {r.type}
+                </Badge>
+                <Card.Title className="fw-bold mb-1 line-clamp-2" style={{ fontSize: '0.9rem' }}>
+                  {r.title}
+                </Card.Title>
+                {r.subtitle && (
+                  <Card.Subtitle className="text-muted small line-clamp-1">
+                    {r.subtitle}
+                  </Card.Subtitle>
+                )}
+                {r.snippet && (
+                  <Card.Text className="text-muted small line-clamp-2 mb-0">
+                    {r.snippet}
+                  </Card.Text>
+                )}
               </Card.Body>
             </Card>
           </Col>
