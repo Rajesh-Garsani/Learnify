@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, ProgressBar, Alert, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Card, ProgressBar, Alert, Spinner, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../axiosConfig';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -11,6 +11,8 @@ function Profile() {
 
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [nextUrl, setNextUrl] = useState(null);
 
   useEffect(() => {
     if (!token) {
@@ -22,12 +24,43 @@ function Profile() {
 
   const fetchMyCourses = async () => {
     try {
-      const res = await axios.get('/api/progress/my-courses/');
-      setCourses(res.data);
+      // Pass a large page_size so all courses load in one request.
+      // If the backend paginates regardless, we handle nextUrl below.
+      const res = await axios.get('/api/progress/my-courses/?page_size=100');
+      const data = res.data;
+
+      // Support both paginated { results, next } and plain array responses
+      if (Array.isArray(data)) {
+        setCourses(data);
+        setNextUrl(null);
+      } else {
+        setCourses(data.results || []);
+        setNextUrl(data.next || null);
+      }
     } catch (err) {
       console.error("Profile fetch error:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMore = async () => {
+    if (!nextUrl || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const res = await axios.get(nextUrl);
+      const data = res.data;
+      if (Array.isArray(data)) {
+        setCourses(prev => [...prev, ...data]);
+        setNextUrl(null);
+      } else {
+        setCourses(prev => [...prev, ...(data.results || [])]);
+        setNextUrl(data.next || null);
+      }
+    } catch (err) {
+      console.error("Load more error:", err);
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -46,7 +79,12 @@ function Profile() {
         </div>
       </div>
 
-      <h4 className="mb-3">Your Learning History</h4>
+      <h4 className="mb-3">
+        Your Learning History
+        {courses.length > 0 && (
+          <span className="text-muted fw-normal fs-6 ms-2">({courses.length} course{courses.length !== 1 ? 's' : ''})</span>
+        )}
+      </h4>
 
       {loading ? (
         <div className="text-center py-5">
@@ -57,57 +95,73 @@ function Profile() {
           You haven't started any courses yet. <Link to="/">Browse Courses</Link>
         </Alert>
       ) : (
-        // FIX: Removed xs/sm/md/lg from Row — those props control columns-per-row
-        // and xs={6} was telling Bootstrap to pack 6 columns into one row on mobile.
-        // Column sizing now lives correctly on each <Col> via xs={6} (2-per-row on mobile)
-        // and md={4} (3-per-row on tablet+), matching the Home.jsx pattern.
-        <Row className="g-3 g-md-4">
-          {courses.map((course) => (
-            <Col key={course.course_id} xs={6} md={4}>
-              <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
-                <Card.Body className="d-flex flex-column p-2 p-sm-3 p-md-4 gap-1 gap-md-2">
-                  <Card.Title className="fw-bold mb-0 line-clamp-2 card-title-responsive">
-                    {course.title}
-                  </Card.Title>
+        <>
+          <Row className="g-3 g-md-4">
+            {courses.map((course) => (
+              <Col key={course.course_id} xs={6} md={4}>
+                <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                  <Card.Body className="d-flex flex-column p-2 p-sm-3 p-md-4 gap-1 gap-md-2">
+                    <Card.Title className="fw-bold mb-0 line-clamp-2 card-title-responsive">
+                      {course.title}
+                    </Card.Title>
 
-                  <div className="mt-1">
-                    <div className="d-flex justify-content-between align-items-center small mb-0">
-                      <span className="text-muted progress-label" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        Progress
-                      </span>
-                      <span
-                        className="progress-percent fw-bold flex-shrink-0 ms-1"
-                        style={{ color: course.progress === 100 ? '#10b981' : 'var(--brand-primary)', whiteSpace: 'nowrap' }}
-                      >
-                        {course.progress}%
-                      </span>
+                    <div className="mt-1">
+                      <div className="d-flex justify-content-between align-items-center small mb-0">
+                        <span className="text-muted progress-label" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          Progress
+                        </span>
+                        <span
+                          className="progress-percent fw-bold flex-shrink-0 ms-1"
+                          style={{ color: course.progress === 100 ? '#10b981' : 'var(--brand-primary)', whiteSpace: 'nowrap' }}
+                        >
+                          {course.progress}%
+                        </span>
+                      </div>
+                      <ProgressBar
+                        now={course.progress}
+                        variant={course.progress === 100 ? "success" : "info"}
+                        height="6px"
+                        className="rounded-pill"
+                        style={{ backgroundColor: '#e2e8f0' }}
+                      />
                     </div>
-                    <ProgressBar
-                      now={course.progress}
-                      variant={course.progress === 100 ? "success" : "info"}
-                      height="6px"
-                      className="rounded-pill"
-                      style={{ backgroundColor: '#e2e8f0' }}
-                    />
-                  </div>
 
-                  <div className="d-flex justify-content-between align-items-center mt-1">
-                    <small className="text-muted topics-count" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {course.completed} / {course.total} topics
-                    </small>
-                    <Link
-                      to={`/course/${course.course_id}`}
-                      className="btn btn-sm btn-outline-primary rounded-pill btn-responsive flex-shrink-0 ms-1"
-                      style={{ whiteSpace: 'nowrap' }}
-                    >
-                      Continue
-                    </Link>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                    <div className="d-flex justify-content-between align-items-center mt-1">
+                      <small className="text-muted topics-count" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {course.completed} / {course.total} topics
+                      </small>
+                      <Link
+                        to={`/course/${course.course_id}`}
+                        className="btn btn-sm btn-outline-primary rounded-pill btn-responsive flex-shrink-0 ms-1"
+                        style={{ whiteSpace: 'nowrap' }}
+                      >
+                        Continue
+                      </Link>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+
+          {/* Load More — only shown when backend has more pages */}
+          {nextUrl && (
+            <div className="text-center mt-4">
+              <Button
+                variant="outline-primary"
+                className="rounded-pill px-4"
+                onClick={fetchMore}
+                disabled={loadingMore}
+              >
+                {loadingMore ? (
+                  <><Spinner animation="border" size="sm" className="me-2" />Loading...</>
+                ) : (
+                  'Load more courses'
+                )}
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
       <style>{`
