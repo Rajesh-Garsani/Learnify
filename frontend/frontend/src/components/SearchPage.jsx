@@ -256,6 +256,7 @@ function SearchPage() {
           -webkit-line-clamp: 1;
           -webkit-box-orient: vertical;
           overflow: hidden;
+          overflow-wrap: break-word;
           word-break: break-word;
         }
         .line-clamp-2 {
@@ -263,18 +264,20 @@ function SearchPage() {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+          overflow-wrap: break-word;
           word-break: break-word;
         }
         .min-width-0 { min-width: 0; }
+
         @media (max-width: 576px) {
           .card-title-responsive { font-size: 0.8rem !important; }
           .card-desc-responsive { font-size: 0.7rem !important; }
           .card-subtitle-responsive { font-size: 0.65rem !important; }
           .icon-responsive { font-size: 1rem !important; }
-          .card-body { padding: 0.5rem !important; }
           .badge { font-size: 0.5rem !important; }
           .gap-1 { gap: 0.15rem !important; }
         }
+
         @media (min-width: 577px) and (max-width: 768px) {
           .card-title-responsive { font-size: 0.9rem !important; }
           .card-desc-responsive { font-size: 0.75rem !important; }
