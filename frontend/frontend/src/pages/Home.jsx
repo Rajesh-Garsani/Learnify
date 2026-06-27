@@ -6,7 +6,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../App.css";
 
-// ✅ Use VITE_API_URL (already set on Vercel) or fallback to axios baseURL or localhost
 const API_BASE_URL = process.env.VITE_API_URL || axios.defaults.baseURL || 'http://localhost:8000';
 
 function Home() {
@@ -109,10 +108,10 @@ function Home() {
         </Link>
       </div>
 
-      <Row className="g-4 mb-5">
+      <Row className="g-3 g-md-4 mb-5">
         {courses && courses.length > 0 ? (
           courses.map(course => (
-            <Col key={course.id} xs={4} sm={6} md={4}>
+            <Col key={course.id} xs={6} sm={6} md={4}>
               <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
                 <div className="d-none d-sm-block">
                   {course.thumbnail ? (
@@ -129,23 +128,25 @@ function Home() {
                   )}
                 </div>
 
-                <Card.Body className="d-flex flex-column p-3 p-md-4 flex-grow-1">
-                  <div className="d-flex justify-content-between align-items-start mb-2">
-                    <span className="badge bg-light text-dark border text-capitalize px-2 py-1">
+                <Card.Body className="d-flex flex-column p-2 p-sm-3 p-md-4 flex-grow-1">
+                  <div className="d-flex justify-content-between align-items-start mb-1 mb-sm-2">
+                    <span className="badge bg-light text-dark border text-capitalize px-2 py-1" style={{ fontSize: '0.65rem' }}>
                       {course.difficulty}
                     </span>
-                    <span className="fw-bold" style={{ color: course.is_free ? '#10b981' : 'var(--text-main)', fontSize: '0.9rem' }}>
+                    <span className="fw-bold" style={{ color: course.is_free ? '#10b981' : 'var(--text-main)', fontSize: '0.75rem' }}>
                       {course.is_free ? 'Free' : `$${course.price}`}
                     </span>
                   </div>
 
-                  <Card.Title className="h6 fw-bold mb-2 line-clamp-2 card-title-responsive">{course.title}</Card.Title>
+                  <Card.Title className="fw-bold mb-1 line-clamp-2 card-title-responsive" style={{ fontSize: '0.9rem' }}>
+                    {course.title}
+                  </Card.Title>
 
-                  <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-3 card-desc-responsive">
+                  <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-2 card-desc-responsive" style={{ fontSize: '0.75rem' }}>
                     {stripHtml(course.short_description)}
                   </Card.Text>
 
-                  <Link to={`/course/${course.id}`} className="btn btn-outline-primary btn-sm w-100 fw-bold mt-auto rounded-3 btn-responsive">
+                  <Link to={`/course/${course.id}`} className="btn btn-outline-primary btn-sm w-100 fw-bold mt-auto rounded-3 btn-responsive" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
                     View Course
                   </Link>
                 </Card.Body>
@@ -171,30 +172,30 @@ function Home() {
         </Link>
       </div>
 
-      <Row className="g-4 mb-5">
+      <Row className="g-3 g-md-4 mb-5">
         {categories && categories.length > 0 ? (
           categories.map(category => (
-            <Col key={category.id} xs={4} sm={6} md={4}>
+            <Col key={category.id} xs={6} sm={6} md={4}>
               <Card className="text-center h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px' }}>
-                <Card.Body className="d-flex flex-column p-4 flex-grow-1">
-                  <div className="mb-3">
+                <Card.Body className="d-flex flex-column p-2 p-sm-3 p-md-4 flex-grow-1">
+                  <div className="mb-2">
                     <div style={{
-                      width: '60px', height: '60px', margin: '0 auto',
+                      width: '50px', height: '50px', margin: '0 auto',
                       background: 'rgba(13, 148, 136, 0.1)', borderRadius: '50%',
                       display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
-                      <i className="bi bi-grid-fill fs-3" style={{ color: 'var(--brand-primary)' }}></i>
+                      <i className="bi bi-grid-fill fs-4" style={{ color: 'var(--brand-primary)' }}></i>
                     </div>
                   </div>
-                  <Card.Title className="fw-bold h5 mb-2 card-title-responsive">{category.name}</Card.Title>
-                  <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-4 card-desc-responsive">
+                  <Card.Title className="fw-bold h6 mb-1 card-title-responsive" style={{ fontSize: '0.9rem' }}>{category.name}</Card.Title>
+                  <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-2 card-desc-responsive" style={{ fontSize: '0.75rem' }}>
                     {stripHtml(category.description) || `Explore all courses related to ${category.name}.`}
                   </Card.Text>
                   <Button
                     as={Link}
                     to={`/category/${category.id}`}
                     className="btn btn-light w-100 fw-bold border mt-auto rounded-3 btn-responsive"
-                    style={{ color: '#ffffff' }}
+                    style={{ color: '#ffffff', fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
                   >
                     Explore
                   </Button>
@@ -213,19 +214,22 @@ function Home() {
       </Row>
 
       <style>{`
-        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
         .transition-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .transition-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
+
         @media (max-width: 576px) {
-          .card-title-responsive { font-size: 0.85rem !important; }
-          .card-desc-responsive { font-size: 0.75rem !important; }
-          .btn-responsive { font-size: 0.75rem !important; padding: 0.3rem 0.5rem !important; }
-          .card-body { padding: 0.75rem !important; }
+          .card-title-responsive { font-size: 0.8rem !important; }
+          .card-desc-responsive { font-size: 0.7rem !important; }
+          .btn-responsive { font-size: 0.7rem !important; padding: 0.2rem 0.4rem !important; }
+          .card-body { padding: 0.5rem !important; }
+          .badge { font-size: 0.55rem !important; }
+          .fw-bold { font-size: 0.7rem !important; }
         }
         @media (min-width: 577px) and (max-width: 768px) {
-          .card-title-responsive { font-size: 0.95rem !important; }
-          .card-desc-responsive { font-size: 0.8rem !important; }
-          .btn-responsive { font-size: 0.8rem !important; padding: 0.4rem 0.75rem !important; }
+          .card-title-responsive { font-size: 0.9rem !important; }
+          .card-desc-responsive { font-size: 0.75rem !important; }
+          .btn-responsive { font-size: 0.75rem !important; padding: 0.25rem 0.5rem !important; }
         }
       `}</style>
     </Container>
