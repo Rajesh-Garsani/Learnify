@@ -56,7 +56,7 @@ function Profile() {
           You haven't started any courses yet. <Link to="/">Browse Courses</Link>
         </Alert>
       ) : (
-        <Row xs={6} sm={6} md={4} lg={4} className="g-2 g-md-4">
+        <Row xs={6} sm={6} md={6} lg={4} className="g-2 g-md-4">
           {courses.map((course) => (
             <Col key={course.course_id}>
               <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
@@ -66,10 +66,12 @@ function Profile() {
                   </Card.Title>
                   <div className="mt-1">
                     <div className="d-flex justify-content-between align-items-center small mb-0">
-                      <span className="text-muted progress-label" style={{ minWidth: 0 }}>Progress</span>
+                      <span className="text-muted progress-label" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        Progress
+                      </span>
                       <span
                         className="progress-percent fw-bold flex-shrink-0 ms-1"
-                        style={{ color: course.progress === 100 ? '#10b981' : 'var(--brand-primary)', minWidth: 0 }}
+                        style={{ color: course.progress === 100 ? '#10b981' : 'var(--brand-primary)', whiteSpace: 'nowrap' }}
                       >
                         {course.progress}%
                       </span>
@@ -83,13 +85,13 @@ function Profile() {
                     />
                   </div>
                   <div className="d-flex justify-content-between align-items-center mt-1">
-                    <small className="text-muted topics-count" style={{ minWidth: 0 }}>
+                    <small className="text-muted topics-count" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {course.completed} / {course.total} topics
                     </small>
                     <Link
                       to={`/course/${course.course_id}`}
                       className="btn btn-sm btn-outline-primary rounded-pill btn-responsive flex-shrink-0 ms-1"
-                      style={{ minWidth: 0 }}
+                      style={{ whiteSpace: 'nowrap' }}
                     >
                       Continue
                     </Link>
