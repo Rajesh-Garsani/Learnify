@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, ProgressBar, Alert, Spinner } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../axiosConfig';
-import 'bootstrap/dist/css/bootstrap.min.css';   // ← CRITICAL: enables the grid
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Profile() {
   const navigate = useNavigate();
@@ -57,9 +57,13 @@ function Profile() {
           You haven't started any courses yet. <Link to="/">Browse Courses</Link>
         </Alert>
       ) : (
-        <Row xs={6} sm={6} md={6} lg={4} className="g-2 g-md-4">
+        // FIX: Removed xs/sm/md/lg from Row — those props control columns-per-row
+        // and xs={6} was telling Bootstrap to pack 6 columns into one row on mobile.
+        // Column sizing now lives correctly on each <Col> via xs={6} (2-per-row on mobile)
+        // and md={4} (3-per-row on tablet+), matching the Home.jsx pattern.
+        <Row className="g-3 g-md-4">
           {courses.map((course) => (
-            <Col key={course.course_id}>
+            <Col key={course.course_id} xs={6} md={4}>
               <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
                 <Card.Body className="d-flex flex-column p-2 p-sm-3 p-md-4 gap-1 gap-md-2">
                   <Card.Title className="fw-bold mb-0 line-clamp-2 card-title-responsive">
@@ -125,7 +129,6 @@ function Profile() {
           .progress-label { font-size: 0.6rem !important; }
           .topics-count { font-size: 0.6rem !important; }
           .progress-percent { font-size: 0.6rem !important; }
-          .gap-1 { gap: 0.15rem !important; }
         }
 
         @media (min-width: 577px) and (max-width: 768px) {
