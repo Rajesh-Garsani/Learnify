@@ -117,7 +117,6 @@ function SearchPage() {
 
   return (
     <Container className="search-page py-5">
-      {/* Search Input */}
       <div className="mb-4">
         <Form onSubmit={handleSearch}>
           <InputGroup size="lg" className="shadow-sm rounded-3 overflow-hidden">
@@ -137,7 +136,6 @@ function SearchPage() {
         </Form>
       </div>
 
-      {/* Filters */}
       <div className="search-filters mb-4">
         <div className="d-flex flex-wrap gap-2">
           {filters.map(filter => (
@@ -155,7 +153,6 @@ function SearchPage() {
         </div>
       </div>
 
-      {/* Results */}
       <div className="search-results">
         {loading ? (
           <div className="text-center py-5">
@@ -201,7 +198,6 @@ function SearchPage() {
                             )}
                           </div>
                         </div>
-
                         {item.snippet && (
                           <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-0 card-desc-responsive">
                             {stripHtml(item.snippet)}
@@ -229,7 +225,6 @@ function SearchPage() {
             </div>
             <h4>Start Searching</h4>
             <p className="text-muted">Enter keywords to find courses, topics, and more</p>
-
             <div className="mt-4">
               <h6 className="mb-3">Popular Searches</h6>
               <div className="d-flex flex-wrap gap-2 justify-content-center">
@@ -254,70 +249,24 @@ function SearchPage() {
       </div>
 
       <style>{`
-        .transition-hover {
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .transition-hover:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
-        }
-        .line-clamp-1 {
-          display: -webkit-box;
-          -webkit-line-clamp: 1;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          word-break: break-word;
-          overflow-wrap: break-word;
-        }
-        .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          word-break: break-word;
-          overflow-wrap: break-word;
-        }
-        .min-width-0 {
-          min-width: 0;
-        }
-
-        /* Responsive */
+        .transition-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .transition-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
+        .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+        .min-width-0 { min-width: 0; }
         @media (max-width: 576px) {
-          .card-title-responsive {
-            font-size: 0.8rem !important;
-          }
-          .card-desc-responsive {
-            font-size: 0.7rem !important;
-          }
-          .card-subtitle-responsive {
-            font-size: 0.65rem !important;
-          }
-          .icon-responsive {
-            font-size: 1rem !important;
-          }
-          .card-body {
-            padding: 0.5rem !important;
-          }
-          .badge {
-            font-size: 0.5rem !important;
-          }
-          .gap-1 {
-            gap: 0.15rem !important;
-          }
+          .card-title-responsive { font-size: 0.8rem !important; }
+          .card-desc-responsive { font-size: 0.7rem !important; }
+          .card-subtitle-responsive { font-size: 0.65rem !important; }
+          .icon-responsive { font-size: 1rem !important; }
+          .card-body { padding: 0.5rem !important; }
+          .badge { font-size: 0.5rem !important; }
+          .gap-1 { gap: 0.15rem !important; }
         }
         @media (min-width: 577px) and (max-width: 768px) {
-          .card-title-responsive {
-            font-size: 0.9rem !important;
-          }
-          .card-desc-responsive {
-            font-size: 0.75rem !important;
-          }
-          .card-subtitle-responsive {
-            font-size: 0.7rem !important;
-          }
-          .icon-responsive {
-            font-size: 1.15rem !important;
-          }
+          .card-title-responsive { font-size: 0.9rem !important; }
+          .card-desc-responsive { font-size: 0.75rem !important; }
+          .card-subtitle-responsive { font-size: 0.7rem !important; }
         }
       `}</style>
     </Container>
