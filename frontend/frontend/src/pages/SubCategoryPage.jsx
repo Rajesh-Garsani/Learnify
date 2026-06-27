@@ -220,57 +220,35 @@ function SubCategoryPage() {
 
       {/* ===== MOBILE FILTER BAR (sticky, hidden on lg) ===== */}
       <div className="bg-white p-2 rounded-4 shadow-sm mb-3 d-lg-none sticky-top" style={{ zIndex: 1030, top: '0' }}>
-        <div className="d-flex flex-nowrap gap-2 align-items-center">
-          <div className="flex-grow-1" style={{ minWidth: 0 }}>
-            <Form.Select
-              value={selectedSubcategory?.id || ''}
-              onChange={(e) => {
-                const subcat = subcategories.find(sc => sc.id === parseInt(e.target.value));
-                if (subcat) handleSubcategoryClick(subcat);
-              }}
-              className="shadow-none rounded-3"
-              size="sm"
-              style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}
-            >
-              <option value="">Select Topic</option>
-              {subcategories.map(sc => (
-                <option key={sc.id} value={sc.id}>{sc.name}</option>
-              ))}
-            </Form.Select>
-          </div>
-
-          <div className="flex-grow-1" style={{ minWidth: 0 }}>
-            <Form.Select
-              value={difficulty}
-              onChange={(e) => handleDifficultyClick(e.target.value)}
-              className="shadow-none rounded-3"
-              size="sm"
-              style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}
-            >
-              <option value="">All Levels</option>
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
-            </Form.Select>
-          </div>
-
-          <div className="flex-grow-1" style={{ minWidth: 0 }}>
-            <Form onSubmit={handleSearch} className="d-flex">
-              <Form.Control
-                type="search"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="shadow-none rounded-3"
-                size="sm"
-                style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}
-              />
-              <Button type="submit" variant="outline-secondary" size="sm" className="ms-1" style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}>
-                <i className="bi bi-search"></i>
-              </Button>
-            </Form>
-          </div>
+        {/* Row 1: Difficulty filter (full width) */}
+        <div className="mb-2">
+          <Form.Select
+            value={difficulty}
+            onChange={(e) => handleDifficultyClick(e.target.value)}
+            className="shadow-none rounded-3 w-100"
+            size="sm"
+          >
+            <option value="">All Levels</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </Form.Select>
         </div>
+        {/* Row 2: Search (full width) */}
+        <Form onSubmit={handleSearch}>
+          <InputGroup size="sm">
+            <Form.Control
+              type="search"
+              placeholder="Search courses..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="shadow-none rounded-start-3"
+            />
+            <Button type="submit" variant="outline-secondary" className="rounded-end-3">
+              <i className="bi bi-search"></i>
+            </Button>
+          </InputGroup>
+        </Form>
       </div>
 
       <Row>
@@ -293,37 +271,6 @@ function SubCategoryPage() {
                 </InputGroup>
               </Form>
             </Card.Body>
-          </Card>
-
-          <Card className="modern-card mb-4 border-0">
-            <Card.Header className="bg-white border-bottom p-3">
-              <h6 className="mb-0 fw-bold">
-                <i className="bi bi-grid-fill me-2" style={{ color: 'var(--brand-primary)' }}></i> Select Topic
-              </h6>
-            </Card.Header>
-            <ListGroup variant="flush" className="p-2">
-              {subcategories.map(sc => {
-                const isActive = selectedSubcategory?.id === sc.id;
-                return (
-                  <ListGroup.Item
-                    key={sc.id}
-                    action
-                    onClick={() => handleSubcategoryClick(sc)}
-                    className="border-0 rounded-3 mb-1 d-flex align-items-center transition-all fw-medium"
-                    style={{
-                      background: isActive ? 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' : 'transparent',
-                      color: isActive ? 'white' : 'var(--text-muted)'
-                    }}
-                  >
-                    <div className="d-flex align-items-center flex-grow-1">
-                      <div style={{ width: '4px', height: '16px', background: isActive ? 'white' : '#e2e8f0', borderRadius: '2px', marginRight: '0.75rem' }}></div>
-                      {sc.name}
-                    </div>
-                    {isActive && <i className="bi bi-chevron-right ms-auto"></i>}
-                  </ListGroup.Item>
-                );
-              })}
-            </ListGroup>
           </Card>
 
           <Card className="modern-card mb-4 border-0">
