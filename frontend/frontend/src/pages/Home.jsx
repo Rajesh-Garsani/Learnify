@@ -6,6 +6,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../App.css";
 
+// ✅ Use VITE_API_URL (already set on Vercel) or fallback to axios baseURL or localhost
+const API_BASE_URL = process.env.VITE_API_URL || axios.defaults.baseURL || 'http://localhost:8000';
 
 function Home() {
   const [courses, setCourses] = useState([]);
@@ -99,6 +101,7 @@ function Home() {
 
       {error && <Alert variant="danger">{error}</Alert>}
 
+      {/* ===== COURSES SECTION ===== */}
       <div className="d-flex justify-content-between align-items-center mb-4 mt-5">
         <h3 className="fw-bold m-0 text-dark">{sectionTitle}</h3>
         <Link to="/courses" className="text-decoration-none fw-semibold" style={{ color: 'var(--brand-primary)' }}>
@@ -115,7 +118,7 @@ function Home() {
                   {course.thumbnail ? (
                     <Card.Img
                       variant="top"
-                       src={course.thumbnail.startsWith('http') ? course.thumbnail : `http://127.0.0.1:8000${course.thumbnail}`}
+                      src={course.thumbnail.startsWith('http') ? course.thumbnail : `${API_BASE_URL}${course.thumbnail}`}
                       style={{ height: '160px', objectFit: 'cover' }}
                       alt={course.title}
                     />
@@ -160,6 +163,7 @@ function Home() {
         )}
       </Row>
 
+      {/* ===== CATEGORIES SECTION ===== */}
       <div className="d-flex justify-content-between align-items-center mb-4 mt-5">
         <h3 className="fw-bold m-0 text-dark">Browse by Category</h3>
         <Link to="/categories" className="text-decoration-none fw-semibold" style={{ color: 'var(--brand-primary)' }}>
