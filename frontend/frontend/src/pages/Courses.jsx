@@ -4,12 +4,13 @@ import { Link } from 'react-router-dom';
 import axios from '../axiosConfig';
 import "../index.css";
 
+const API_BASE_URL = process.env.VITE_API_URL || axios.defaults.baseURL || 'http://localhost:8000';
+
 function Courses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Filtering State
   const [difficultyFilter, setDifficultyFilter] = useState('');
   const [priceFilter, setPriceFilter] = useState('');
 
@@ -52,7 +53,6 @@ function Courses() {
     }
   };
 
-  // Filter components (shared logic)
   const DifficultySelect = ({ compact = false }) => (
     <Form.Select
       value={difficultyFilter}
@@ -97,7 +97,6 @@ function Courses() {
   return (
     <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '4rem' }}>
 
-      {/* Page Header */}
       <div className="bg-white border-bottom py-5 mb-4 shadow-sm">
         <Container>
           <Row className="align-items-center">
@@ -112,7 +111,6 @@ function Courses() {
       <Container>
         {error && <Alert variant="danger" className="border-0 shadow-sm rounded-3">{error}</Alert>}
 
-        {/* ===== TOP FILTER BAR – visible only on smaller screens (hidden on lg+) ===== */}
         <div
           className="bg-white p-2 rounded-4 shadow-sm mb-3 d-lg-none sticky-top"
           style={{ zIndex: 1030, top: '0' }}
@@ -136,48 +134,40 @@ function Courses() {
           </div>
         </div>
 
-        {/* ===== MAIN ROW: Sidebar + Course Grid ===== */}
         <Row>
-          {/* Sidebar Filter – visible only on lg+ */}
           <Col lg={3} className="d-none d-lg-block">
             <Card className="border-0 shadow-sm rounded-4 sticky-top" style={{ top: '100px' }}>
               <Card.Body className="p-4">
                 <h5 className="fw-bold mb-4">Filter Courses</h5>
-
                 <Form.Group className="mb-4">
                   <Form.Label className="fw-medium text-muted small text-uppercase">Difficulty</Form.Label>
                   <DifficultySelect />
                 </Form.Group>
-
                 <Form.Group className="mb-4">
                   <Form.Label className="fw-medium text-muted small text-uppercase">Price</Form.Label>
                   <PriceSelect />
                 </Form.Group>
-
                 <ClearButton />
               </Card.Body>
             </Card>
           </Col>
 
-          {/* Course Grid */}
           <Col lg={9}>
             {loading ? (
               <div className="d-flex justify-content-center py-5">
                 <Spinner animation="border" style={{ color: 'var(--brand-primary)' }} />
               </div>
             ) : (
-              <Row className="g-4">
+              <Row className="g-3 g-md-4">
                 {courses.length > 0 ? (
                   courses.map(course => (
-                    <Col key={course.id} xs={4} sm={6} md={4} lg={4}>
+                    <Col key={course.id} xs={6} sm={6} md={4} lg={4}>
                       <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
-
-                        {/* Thumbnail – hidden on extra‑small screens */}
                         <div className="d-none d-sm-block">
                           {course.thumbnail ? (
                             <Card.Img
                               variant="top"
-                              src={course.thumbnail.startsWith('http') ? course.thumbnail : `http://127.0.0.1:8000${course.thumbnail}`}
+                              src={course.thumbnail.startsWith('http') ? course.thumbnail : `${API_BASE_URL}${course.thumbnail}`}
                               style={{ height: '160px', objectFit: 'cover' }}
                               alt={course.title}
                             />
@@ -188,27 +178,27 @@ function Courses() {
                           )}
                         </div>
 
-                        <Card.Body className="d-flex flex-column p-3 p-md-4 flex-grow-1">
-                          <div className="d-flex justify-content-between align-items-start mb-2">
+                        <Card.Body className="d-flex flex-column p-2 p-sm-3 p-md-4 flex-grow-1">
+                          <div className="d-flex justify-content-between align-items-start mb-1 mb-sm-2">
                             <Badge
                               style={{
                                 backgroundColor: getDifficultyColor(course.difficulty),
-                                padding: '0.25rem 0.5rem', borderRadius: '4px',
-                                textTransform: 'capitalize', fontWeight: '500', fontSize: '0.7rem'
+                                padding: '0.2rem 0.4rem', borderRadius: '4px',
+                                textTransform: 'capitalize', fontWeight: '500', fontSize: '0.65rem'
                               }}
                             >
                               {course.difficulty}
                             </Badge>
-                            <span className="fw-bold" style={{ color: course.is_free ? '#10b981' : 'var(--text-main)', fontSize: '0.8rem' }}>
+                            <span className="fw-bold" style={{ color: course.is_free ? '#10b981' : 'var(--text-main)', fontSize: '0.7rem' }}>
                               {course.is_free ? 'Free' : `$${course.price}`}
                             </span>
                           </div>
 
-                          <Card.Title className="h6 fw-bold mb-2 line-clamp-2 card-title-responsive">
+                          <Card.Title className="h6 fw-bold mb-1 line-clamp-2 card-title-responsive" style={{ fontSize: '0.85rem' }}>
                             {course.title}
                           </Card.Title>
 
-                          <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-3 card-desc-responsive">
+                          <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-2 card-desc-responsive" style={{ fontSize: '0.7rem' }}>
                             {stripHtml(course.short_description)}
                           </Card.Text>
 
@@ -218,6 +208,7 @@ function Courses() {
                             variant="outline-primary"
                             className="mt-auto w-100 fw-bold rounded-3 btn-responsive"
                             size="sm"
+                            style={{ fontSize: '0.7rem', padding: '0.2rem 0.4rem' }}
                           >
                             View Course
                           </Button>
@@ -243,7 +234,6 @@ function Courses() {
         </Row>
       </Container>
 
-      {/* Inline styles for card hover, truncation, and responsiveness */}
       <style>{`
         .transition-hover {
           transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -257,35 +247,21 @@ function Courses() {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+          word-break: break-word;
         }
 
         @media (max-width: 576px) {
-          .card-title-responsive {
-            font-size: 0.85rem !important;
-          }
-          .card-desc-responsive {
-            font-size: 0.75rem !important;
-          }
-          .btn-responsive {
-            font-size: 0.75rem !important;
-            padding: 0.3rem 0.5rem !important;
-          }
-          .card-body {
-            padding: 0.75rem !important;
-          }
+          .card-title-responsive { font-size: 0.8rem !important; }
+          .card-desc-responsive { font-size: 0.7rem !important; }
+          .btn-responsive { font-size: 0.7rem !important; padding: 0.2rem 0.4rem !important; }
+          .card-body { padding: 0.5rem !important; }
+          .badge { font-size: 0.55rem !important; }
+          .fw-bold { font-size: 0.65rem !important; }
         }
-
         @media (min-width: 577px) and (max-width: 768px) {
-          .card-title-responsive {
-            font-size: 0.95rem !important;
-          }
-          .card-desc-responsive {
-            font-size: 0.8rem !important;
-          }
-          .btn-responsive {
-            font-size: 0.8rem !important;
-            padding: 0.4rem 0.75rem !important;
-          }
+          .card-title-responsive { font-size: 0.9rem !important; }
+          .card-desc-responsive { font-size: 0.75rem !important; }
+          .btn-responsive { font-size: 0.75rem !important; padding: 0.25rem 0.5rem !important; }
         }
       `}</style>
     </div>
