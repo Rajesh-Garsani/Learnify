@@ -179,7 +179,7 @@ function SearchPage() {
                       onClick={() => navigateToResult(item)}
                       style={{ borderRadius: '12px', cursor: 'pointer', overflow: 'hidden' }}
                     >
-                      <Card.Body className="p-2 p-md-3 p-lg-4 d-flex flex-column gap-1 gap-md-2">
+                      <Card.Body className="p-2 p-sm-3 p-lg-4 d-flex flex-column gap-1 gap-md-2">
                         <div className="d-flex align-items-start">
                           <div className="search-result-icon me-2 flex-shrink-0 d-none d-sm-block" style={{ marginTop: '2px' }}>
                             <i className={`bi ${getIconForType(item.type)} fs-5 icon-responsive`} style={{ color: 'var(--brand-primary)' }}></i>
@@ -251,8 +251,20 @@ function SearchPage() {
       <style>{`
         .transition-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .transition-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
-        .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
-        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+        .line-clamp-1 {
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          word-break: break-word;
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          word-break: break-word;
+        }
         .min-width-0 { min-width: 0; }
         @media (max-width: 576px) {
           .card-title-responsive { font-size: 0.8rem !important; }
