@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, ProgressBar, Alert, Spinner } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../axiosConfig';
+import 'bootstrap/dist/css/bootstrap.min.css';   // ← CRITICAL: enables the grid
 
 function Profile() {
   const navigate = useNavigate();
@@ -56,43 +57,23 @@ function Profile() {
           You haven't started any courses yet. <Link to="/">Browse Courses</Link>
         </Alert>
       ) : (
-        <Row
-          // xs: <576px → 2 columns (12/6=2)
-          // sm: ≥576px → 2 columns
-          // md: ≥768px → 2 columns (NOT 3)
-          // lg: ≥992px → 3 columns (12/4=3) – still clean on desktop
-          xs={6} sm={6} md={6} lg={4}
-          className="g-2 g-md-4"
-        >
+        <Row xs={6} sm={6} md={6} lg={4} className="g-2 g-md-4">
           {courses.map((course) => (
             <Col key={course.course_id}>
-              <Card
-                className="h-100 shadow-sm border-0 transition-hover"
-                style={{ borderRadius: '12px', overflow: 'hidden' }}
-              >
+              <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
                 <Card.Body className="d-flex flex-column p-2 p-sm-3 p-md-4 gap-1 gap-md-2">
-                  {/* Title – always bold, no arbitrary global size override */}
                   <Card.Title className="fw-bold mb-0 line-clamp-2 card-title-responsive">
                     {course.title}
                   </Card.Title>
 
-                  {/* Progress row */}
                   <div className="mt-1">
                     <div className="d-flex justify-content-between align-items-center small mb-0">
-                      {/* "Progress" label – allowed to shrink */}
-                      <span
-                        className="text-muted progress-label"
-                        style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
-                      >
+                      <span className="text-muted progress-label" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         Progress
                       </span>
-                      {/* Percentage – must NOT shrink, so it stays visible */}
                       <span
                         className="progress-percent fw-bold flex-shrink-0 ms-1"
-                        style={{
-                          color: course.progress === 100 ? '#10b981' : 'var(--brand-primary)',
-                          whiteSpace: 'nowrap'
-                        }}
+                        style={{ color: course.progress === 100 ? '#10b981' : 'var(--brand-primary)', whiteSpace: 'nowrap' }}
                       >
                         {course.progress}%
                       </span>
@@ -106,12 +87,8 @@ function Profile() {
                     />
                   </div>
 
-                  {/* Topics count + Continue button */}
                   <div className="d-flex justify-content-between align-items-center mt-1">
-                    <small
-                      className="text-muted topics-count"
-                      style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    >
+                    <small className="text-muted topics-count" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {course.completed} / {course.total} topics
                     </small>
                     <Link
@@ -129,17 +106,9 @@ function Profile() {
         </Row>
       )}
 
-      {/* Scoped CSS – only affects this component */}
       <style>{`
-        .transition-hover {
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .transition-hover:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
-        }
-
-        /* Clamp title to 2 lines */
+        .transition-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .transition-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
         .line-clamp-2 {
           display: -webkit-box;
           -webkit-line-clamp: 2;
@@ -148,44 +117,20 @@ function Profile() {
           overflow-wrap: break-word;
           word-break: break-word;
         }
+        .min-width-0 { min-width: 0; }
 
-        .min-width-0 {
-          min-width: 0;
-        }
-
-        /* ----- Mobile < 576px ----- */
         @media (max-width: 576px) {
-          .card-title-responsive {
-            font-size: 0.8rem !important;
-            line-height: 1.2 !important;
-          }
-          .btn-responsive {
-            font-size: 0.65rem !important;
-            padding: 0.15rem 0.5rem !important;
-          }
-          .progress-label {
-            font-size: 0.6rem !important;
-          }
-          .topics-count {
-            font-size: 0.6rem !important;
-          }
-          .progress-percent {
-            font-size: 0.6rem !important;
-          }
-          .gap-1 {
-            gap: 0.15rem !important;
-          }
+          .card-title-responsive { font-size: 0.8rem !important; line-height: 1.2 !important; }
+          .btn-responsive { font-size: 0.65rem !important; padding: 0.15rem 0.5rem !important; }
+          .progress-label { font-size: 0.6rem !important; }
+          .topics-count { font-size: 0.6rem !important; }
+          .progress-percent { font-size: 0.6rem !important; }
+          .gap-1 { gap: 0.15rem !important; }
         }
 
-        /* ----- Small / Medium tablet (577px – 768px) ----- */
         @media (min-width: 577px) and (max-width: 768px) {
-          .card-title-responsive {
-            font-size: 0.9rem !important;
-          }
-          .btn-responsive {
-            font-size: 0.75rem !important;
-            padding: 0.2rem 0.7rem !important;
-          }
+          .card-title-responsive { font-size: 0.9rem !important; }
+          .btn-responsive { font-size: 0.75rem !important; padding: 0.2rem 0.7rem !important; }
         }
       `}</style>
     </Container>
