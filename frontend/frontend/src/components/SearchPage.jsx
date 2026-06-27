@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, Form, InputGroup } from 'react-bootstrap';
 import axios from '../axiosConfig';
+import 'bootstrap/dist/css/bootstrap.min.css';   // ← CRITICAL
 
 function SearchPage() {
   const location = useLocation();
@@ -171,12 +172,7 @@ function SearchPage() {
             </div>
 
             {filteredResults.length > 0 ? (
-              <Row
-                // 2 columns on everything up to 991px (phones & tablets)
-                // 4 columns on large desktops (12/3=4) – still looks great
-                xs={6} sm={6} md={6} lg={3}
-                className="g-2 g-md-3 g-lg-4"
-              >
+              <Row xs={6} sm={6} md={6} lg={3} className="g-2 g-md-3 g-lg-4">
                 {filteredResults.map((item, index) => (
                   <Col key={`${item.type}-${item.id}-${index}`}>
                     <Card
@@ -186,19 +182,12 @@ function SearchPage() {
                     >
                       <Card.Body className="p-2 p-sm-3 p-lg-4 d-flex flex-column gap-1 gap-md-2">
                         <div className="d-flex align-items-start">
-                          {/* Icon – only visible on sm+ */}
                           <div className="search-result-icon me-2 flex-shrink-0 d-none d-sm-block" style={{ marginTop: '2px' }}>
-                            <i
-                              className={`bi ${getIconForType(item.type)} fs-5 icon-responsive`}
-                              style={{ color: 'var(--brand-primary)' }}
-                            ></i>
+                            <i className={`bi ${getIconForType(item.type)} fs-5 icon-responsive`} style={{ color: 'var(--brand-primary)' }}></i>
                           </div>
 
                           <div className="flex-grow-1 min-width-0">
-                            <span
-                              className={`badge bg-${getBadgeColor(item.type)} mb-1 text-uppercase`}
-                              style={{ fontSize: '0.6rem', letterSpacing: '0.02em' }}
-                            >
+                            <span className={`badge bg-${getBadgeColor(item.type)} mb-1 text-uppercase`} style={{ fontSize: '0.6rem', letterSpacing: '0.02em' }}>
                               {item.type}
                             </span>
                             <Card.Title className="h6 fw-bold mb-1 line-clamp-2 card-title-responsive">
@@ -265,16 +254,9 @@ function SearchPage() {
         )}
       </div>
 
-      {/* Component‑scoped responsive styles */}
       <style>{`
-        .transition-hover {
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .transition-hover:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
-        }
-
+        .transition-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .transition-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
         .line-clamp-1 {
           display: -webkit-box;
           -webkit-line-clamp: 1;
@@ -291,11 +273,8 @@ function SearchPage() {
           overflow-wrap: break-word;
           word-break: break-word;
         }
-        .min-width-0 {
-          min-width: 0;
-        }
+        .min-width-0 { min-width: 0; }
 
-        /* Mobile <576px */
         @media (max-width: 576px) {
           .card-title-responsive { font-size: 0.8rem !important; }
           .card-desc-responsive { font-size: 0.7rem !important; }
@@ -305,7 +284,6 @@ function SearchPage() {
           .gap-1 { gap: 0.15rem !important; }
         }
 
-        /* Tablet 577px – 768px */
         @media (min-width: 577px) and (max-width: 768px) {
           .card-title-responsive { font-size: 0.9rem !important; }
           .card-desc-responsive { font-size: 0.75rem !important; }
