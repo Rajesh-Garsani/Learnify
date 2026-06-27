@@ -60,7 +60,7 @@ function Profile() {
           {courses.map((course) => (
             <Col key={course.course_id}>
               <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
-                <Card.Body className="d-flex flex-column p-2 p-md-4 gap-1 gap-md-2">
+                <Card.Body className="d-flex flex-column p-2 p-sm-3 p-md-4 gap-1 gap-md-2">
                   <Card.Title className="fw-bold mb-0 line-clamp-2 card-title-responsive">
                     {course.title}
                   </Card.Title>
@@ -100,7 +100,13 @@ function Profile() {
       <style>{`
         .transition-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .transition-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
-        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          word-break: break-word;
+        }
         .min-width-0 { min-width: 0; }
         @media (max-width: 576px) {
           .card-title-responsive { font-size: 0.8rem !important; line-height: 1.2 !important; }
