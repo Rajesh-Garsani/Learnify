@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, Form, InputGroup } from 'react-bootstrap';
 import axios from '../axiosConfig';
-import 'bootstrap/dist/css/bootstrap.min.css';   // ← CRITICAL
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function SearchPage() {
   const location = useLocation();
@@ -172,9 +172,13 @@ function SearchPage() {
             </div>
 
             {filteredResults.length > 0 ? (
-              <Row xs={6} sm={6} md={6} lg={3} className="g-2 g-md-3 g-lg-4">
+              // FIX: Removed xs/sm/md/lg from Row — those are columns-per-row counts,
+              // not column widths. xs={6} on Row meant 6 cards per row on mobile (~16% wide each).
+              // Column sizing now lives on each <Col>: xs={6} = 2-per-row on mobile,
+              // md={4} = 3-per-row on tablet, lg={3} = 4-per-row on desktop.
+              <Row className="g-2 g-md-3 g-lg-4">
                 {filteredResults.map((item, index) => (
-                  <Col key={`${item.type}-${item.id}-${index}`}>
+                  <Col key={`${item.type}-${item.id}-${index}`} xs={6} md={4} lg={3}>
                     <Card
                       className="h-100 shadow-sm border-0 transition-hover"
                       onClick={() => navigateToResult(item)}
@@ -281,7 +285,6 @@ function SearchPage() {
           .card-subtitle-responsive { font-size: 0.65rem !important; }
           .icon-responsive { font-size: 1rem !important; }
           .badge { font-size: 0.5rem !important; }
-          .gap-1 { gap: 0.15rem !important; }
         }
 
         @media (min-width: 577px) and (max-width: 768px) {
