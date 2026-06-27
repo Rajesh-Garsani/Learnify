@@ -6,7 +6,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../App.css";
 
-// ✅ Define API base URL from environment variable or fallback to localhost
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 function Home() {
@@ -101,9 +100,6 @@ function Home() {
 
       {error && <Alert variant="danger">{error}</Alert>}
 
-      {/* =========================================
-          COURSES SECTION (3 per row on mobile)
-          ========================================= */}
       <div className="d-flex justify-content-between align-items-center mb-4 mt-5">
         <h3 className="fw-bold m-0 text-dark">{sectionTitle}</h3>
         <Link to="/courses" className="text-decoration-none fw-semibold" style={{ color: 'var(--brand-primary)' }}>
@@ -116,12 +112,11 @@ function Home() {
           courses.map(course => (
             <Col key={course.id} xs={4} sm={6} md={4}>
               <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
-                {/* Hide thumbnail on extra-small mobile screens */}
                 <div className="d-none d-sm-block">
                   {course.thumbnail ? (
                     <Card.Img
                       variant="top"
-                      src={course.thumbnail.startsWith('http') ? course.thumbnail : `http://127.0.0.1:8000${course.thumbnail}`}
+                      src={course.thumbnail.startsWith('http') ? course.thumbnail : `${API_BASE_URL}${course.thumbnail}`}
                       style={{ height: '160px', objectFit: 'cover' }}
                       alt={course.title}
                     />
@@ -166,9 +161,6 @@ function Home() {
         )}
       </Row>
 
-      {/* =========================================
-          CATEGORIES SECTION (3 per row on mobile)
-          ========================================= */}
       <div className="d-flex justify-content-between align-items-center mb-4 mt-5">
         <h3 className="fw-bold m-0 text-dark">Browse by Category</h3>
         <Link to="/categories" className="text-decoration-none fw-semibold" style={{ color: 'var(--brand-primary)' }}>
@@ -217,50 +209,20 @@ function Home() {
         )}
       </Row>
 
-      {/* Inline styles for card responsiveness and hover effects */}
       <style>{`
-        .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        .transition-hover {
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .transition-hover:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
-        }
-
-        /* --- Responsive card adjustments --- */
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .transition-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .transition-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
         @media (max-width: 576px) {
-          .card-title-responsive {
-            font-size: 0.85rem !important;
-          }
-          .card-desc-responsive {
-            font-size: 0.75rem !important;
-          }
-          .btn-responsive {
-            font-size: 0.75rem !important;
-            padding: 0.3rem 0.5rem !important;
-          }
-          .card-body {
-            padding: 0.75rem !important;
-          }
+          .card-title-responsive { font-size: 0.85rem !important; }
+          .card-desc-responsive { font-size: 0.75rem !important; }
+          .btn-responsive { font-size: 0.75rem !important; padding: 0.3rem 0.5rem !important; }
+          .card-body { padding: 0.75rem !important; }
         }
-
         @media (min-width: 577px) and (max-width: 768px) {
-          .card-title-responsive {
-            font-size: 0.95rem !important;
-          }
-          .card-desc-responsive {
-            font-size: 0.8rem !important;
-          }
-          .btn-responsive {
-            font-size: 0.8rem !important;
-            padding: 0.4rem 0.75rem !important;
-          }
+          .card-title-responsive { font-size: 0.95rem !important; }
+          .card-desc-responsive { font-size: 0.8rem !important; }
+          .btn-responsive { font-size: 0.8rem !important; padding: 0.4rem 0.75rem !important; }
         }
       `}</style>
     </Container>
