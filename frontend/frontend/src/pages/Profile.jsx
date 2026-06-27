@@ -65,9 +65,12 @@ function Profile() {
                     {course.title}
                   </Card.Title>
                   <div className="mt-1">
-                    <div className="d-flex justify-content-between small mb-0">
-                      <span className="text-muted progress-label">Progress</span>
-                      <span className="fw-bold" style={{ color: course.progress === 100 ? '#10b981' : 'var(--brand-primary)' }}>
+                    <div className="d-flex justify-content-between align-items-center small mb-0">
+                      <span className="text-muted progress-label" style={{ minWidth: 0 }}>Progress</span>
+                      <span
+                        className="progress-percent fw-bold flex-shrink-0 ms-1"
+                        style={{ color: course.progress === 100 ? '#10b981' : 'var(--brand-primary)', minWidth: 0 }}
+                      >
                         {course.progress}%
                       </span>
                     </div>
@@ -80,12 +83,13 @@ function Profile() {
                     />
                   </div>
                   <div className="d-flex justify-content-between align-items-center mt-1">
-                    <small className="text-muted topics-count">
+                    <small className="text-muted topics-count" style={{ minWidth: 0 }}>
                       {course.completed} / {course.total} topics
                     </small>
                     <Link
                       to={`/course/${course.course_id}`}
-                      className="btn btn-sm btn-outline-primary rounded-pill btn-responsive"
+                      className="btn btn-sm btn-outline-primary rounded-pill btn-responsive flex-shrink-0 ms-1"
+                      style={{ minWidth: 0 }}
                     >
                       Continue
                     </Link>
@@ -105,18 +109,20 @@ function Profile() {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+          overflow-wrap: break-word;
           word-break: break-word;
         }
         .min-width-0 { min-width: 0; }
+
         @media (max-width: 576px) {
           .card-title-responsive { font-size: 0.8rem !important; line-height: 1.2 !important; }
-          .card-body { padding: 0.5rem !important; }
           .btn-responsive { font-size: 0.65rem !important; padding: 0.15rem 0.5rem !important; }
           .progress-label { font-size: 0.6rem !important; }
           .topics-count { font-size: 0.6rem !important; }
-          .fw-bold { font-size: 0.6rem !important; }
+          .progress-percent { font-size: 0.6rem !important; }
           .gap-1 { gap: 0.15rem !important; }
         }
+
         @media (min-width: 577px) and (max-width: 768px) {
           .card-title-responsive { font-size: 0.9rem !important; }
           .btn-responsive { font-size: 0.75rem !important; padding: 0.2rem 0.7rem !important; }
