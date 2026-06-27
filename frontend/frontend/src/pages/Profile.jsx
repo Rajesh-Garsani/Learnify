@@ -57,7 +57,7 @@ function Profile() {
           You haven't started any courses yet. <Link to="/">Browse Courses</Link>
         </Alert>
       ) : (
-        <Row xs={4} sm={6} md={4} lg={4} className="g-2 g-md-4">
+        <Row xs={6} sm={6} md={4} lg={4} className="g-2 g-md-4">
           {courses.map((course) => (
             <Col key={course.course_id}>
               <Card className="h-100 shadow-sm border-0 transition-hover" style={{ borderRadius: '12px', overflow: 'hidden' }}>
@@ -66,7 +66,6 @@ function Profile() {
                     {course.title}
                   </Card.Title>
 
-                  {/* Progress */}
                   <div className="mt-1">
                     <div className="d-flex justify-content-between small mb-0">
                       <span className="text-muted progress-label">Progress</span>
@@ -120,7 +119,6 @@ function Profile() {
           min-width: 0;
         }
 
-        /* Mobile adjustments */
         @media (max-width: 576px) {
           .card-title-responsive {
             font-size: 0.8rem !important;
