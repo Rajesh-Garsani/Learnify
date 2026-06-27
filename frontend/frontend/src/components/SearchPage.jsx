@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, Form, InputGroup } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form, InputGroup, Spinner } from 'react-bootstrap';
 import axios from '../axiosConfig';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -13,8 +13,11 @@ function SearchPage() {
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
   const [hasSearched, setHasSearched] = useState(false);
+  const [nextUrl, setNextUrl] = useState(null);
+  const [totalCount, setTotalCount] = useState(0);
 
   const filters = [
     { key: 'all', label: 'All', icon: 'bi-grid' },
@@ -42,16 +45,50 @@ function SearchPage() {
 
     setLoading(true);
     setHasSearched(true);
+    setResults([]);
+    setNextUrl(null);
     navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
 
     try {
-      const res = await axios.get(`/api/search/?q=${encodeURIComponent(searchQuery.trim())}&page_size=20`);
-      setResults(res.data.results || []);
+      // Request a generous page_size upfront so most searches show everything at once
+      const res = await axios.get(`/api/search/?q=${encodeURIComponent(searchQuery.trim())}&page_size=50`);
+      const data = res.data;
+
+      if (Array.isArray(data)) {
+        setResults(data);
+        setNextUrl(null);
+        setTotalCount(data.length);
+      } else {
+        setResults(data.results || []);
+        setNextUrl(data.next || null);
+        setTotalCount(data.count ?? (data.results?.length ?? 0));
+      }
     } catch (err) {
       setResults([]);
+      setNextUrl(null);
       console.error('Search error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMore = async () => {
+    if (!nextUrl || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const res = await axios.get(nextUrl);
+      const data = res.data;
+      if (Array.isArray(data)) {
+        setResults(prev => [...prev, ...data]);
+        setNextUrl(null);
+      } else {
+        setResults(prev => [...prev, ...(data.results || [])]);
+        setNextUrl(data.next || null);
+      }
+    } catch (err) {
+      console.error('Load more error:', err);
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -99,20 +136,11 @@ function SearchPage() {
 
   const navigateToResult = (item) => {
     switch (item.type) {
-      case 'course':
-        navigate(`/course/${item.id}`);
-        break;
-      case 'topic':
-        navigate(`/topic/${item.id}`);
-        break;
-      case 'category':
-        navigate(`/category/${item.id}`);
-        break;
-      case 'subcategory':
-        navigate(`/subcategory/${item.id}`);
-        break;
-      default:
-        break;
+      case 'course': navigate(`/course/${item.id}`); break;
+      case 'topic': navigate(`/topic/${item.id}`); break;
+      case 'category': navigate(`/category/${item.id}`); break;
+      case 'subcategory': navigate(`/subcategory/${item.id}`); break;
+      default: break;
     }
   };
 
@@ -166,58 +194,76 @@ function SearchPage() {
           <>
             <div className="results-count mb-4">
               <h5 className="fw-bold">
-                Found {filteredResults.length} result{filteredResults.length !== 1 ? 's' : ''}
+                {activeFilter !== 'all' ? (
+                  <>Showing {filteredResults.length} {activeFilter} result{filteredResults.length !== 1 ? 's' : ''}</>
+                ) : (
+                  <>Found {totalCount > results.length ? `${results.length}+ ` : filteredResults.length} result{filteredResults.length !== 1 ? 's' : ''}</>
+                )}
                 {query && ` for "${query}"`}
               </h5>
             </div>
 
             {filteredResults.length > 0 ? (
-              // FIX: Removed xs/sm/md/lg from Row — those are columns-per-row counts,
-              // not column widths. xs={6} on Row meant 6 cards per row on mobile (~16% wide each).
-              // Column sizing now lives on each <Col>: xs={6} = 2-per-row on mobile,
-              // md={4} = 3-per-row on tablet, lg={3} = 4-per-row on desktop.
-              <Row className="g-2 g-md-3 g-lg-4">
-                {filteredResults.map((item, index) => (
-                  <Col key={`${item.type}-${item.id}-${index}`} xs={6} md={4} lg={3}>
-                    <Card
-                      className="h-100 shadow-sm border-0 transition-hover"
-                      onClick={() => navigateToResult(item)}
-                      style={{ borderRadius: '12px', cursor: 'pointer', overflow: 'hidden' }}
+              <>
+                <Row className="g-2 g-md-3 g-lg-4">
+                  {filteredResults.map((item, index) => (
+                    <Col key={`${item.type}-${item.id}-${index}`} xs={6} md={4} lg={3}>
+                      <Card
+                        className="h-100 shadow-sm border-0 transition-hover"
+                        onClick={() => navigateToResult(item)}
+                        style={{ borderRadius: '12px', cursor: 'pointer', overflow: 'hidden' }}
+                      >
+                        <Card.Body className="p-2 p-sm-3 p-lg-4 d-flex flex-column gap-1 gap-md-2">
+                          <div className="d-flex align-items-start">
+                            <div className="search-result-icon me-2 flex-shrink-0 d-none d-sm-block" style={{ marginTop: '2px' }}>
+                              <i className={`bi ${getIconForType(item.type)} fs-5 icon-responsive`} style={{ color: 'var(--brand-primary)' }}></i>
+                            </div>
+                            <div className="flex-grow-1 min-width-0">
+                              <span className={`badge bg-${getBadgeColor(item.type)} mb-1 text-uppercase`} style={{ fontSize: '0.6rem', letterSpacing: '0.02em' }}>
+                                {item.type}
+                              </span>
+                              <Card.Title className="h6 fw-bold mb-1 line-clamp-2 card-title-responsive">
+                                {item.title}
+                              </Card.Title>
+                              {item.subtitle && (
+                                <Card.Subtitle
+                                  className="text-muted small line-clamp-1 card-subtitle-responsive"
+                                  style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                                >
+                                  {item.subtitle}
+                                </Card.Subtitle>
+                              )}
+                            </div>
+                          </div>
+                          {item.snippet && (
+                            <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-0 card-desc-responsive">
+                              {stripHtml(item.snippet)}
+                            </Card.Text>
+                          )}
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+
+                {/* Load More — only appears when backend has additional pages */}
+                {nextUrl && activeFilter === 'all' && (
+                  <div className="text-center mt-4">
+                    <Button
+                      variant="outline-primary"
+                      className="rounded-pill px-4"
+                      onClick={fetchMore}
+                      disabled={loadingMore}
                     >
-                      <Card.Body className="p-2 p-sm-3 p-lg-4 d-flex flex-column gap-1 gap-md-2">
-                        <div className="d-flex align-items-start">
-                          <div className="search-result-icon me-2 flex-shrink-0 d-none d-sm-block" style={{ marginTop: '2px' }}>
-                            <i className={`bi ${getIconForType(item.type)} fs-5 icon-responsive`} style={{ color: 'var(--brand-primary)' }}></i>
-                          </div>
-
-                          <div className="flex-grow-1 min-width-0">
-                            <span className={`badge bg-${getBadgeColor(item.type)} mb-1 text-uppercase`} style={{ fontSize: '0.6rem', letterSpacing: '0.02em' }}>
-                              {item.type}
-                            </span>
-                            <Card.Title className="h6 fw-bold mb-1 line-clamp-2 card-title-responsive">
-                              {item.title}
-                            </Card.Title>
-                            {item.subtitle && (
-                              <Card.Subtitle
-                                className="text-muted small line-clamp-1 card-subtitle-responsive"
-                                style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                              >
-                                {item.subtitle}
-                              </Card.Subtitle>
-                            )}
-                          </div>
-                        </div>
-
-                        {item.snippet && (
-                          <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-0 card-desc-responsive">
-                            {stripHtml(item.snippet)}
-                          </Card.Text>
-                        )}
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
+                      {loadingMore ? (
+                        <><Spinner animation="border" size="sm" className="me-2" />Loading...</>
+                      ) : (
+                        'Load more results'
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-center py-5">
                 <div className="no-results-icon mb-3">
@@ -244,10 +290,7 @@ function SearchPage() {
                     variant="outline-secondary"
                     size="sm"
                     className="rounded-pill"
-                    onClick={() => {
-                      setQuery(tag);
-                      performSearch(tag);
-                    }}
+                    onClick={() => { setQuery(tag); performSearch(tag); }}
                   >
                     {tag}
                   </Button>
@@ -262,20 +305,12 @@ function SearchPage() {
         .transition-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .transition-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
         .line-clamp-1 {
-          display: -webkit-box;
-          -webkit-line-clamp: 1;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          overflow-wrap: break-word;
-          word-break: break-word;
+          display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
+          overflow: hidden; overflow-wrap: break-word; word-break: break-word;
         }
         .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          overflow-wrap: break-word;
-          word-break: break-word;
+          display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+          overflow: hidden; overflow-wrap: break-word; word-break: break-word;
         }
         .min-width-0 { min-width: 0; }
 
@@ -286,7 +321,6 @@ function SearchPage() {
           .icon-responsive { font-size: 1rem !important; }
           .badge { font-size: 0.5rem !important; }
         }
-
         @media (min-width: 577px) and (max-width: 768px) {
           .card-title-responsive { font-size: 0.9rem !important; }
           .card-desc-responsive { font-size: 0.75rem !important; }
