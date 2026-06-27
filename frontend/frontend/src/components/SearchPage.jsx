@@ -174,7 +174,7 @@ function SearchPage() {
             </div>
 
             {filteredResults.length > 0 ? (
-              <Row xs={4} sm={6} md={4} lg={3} className="g-2 g-md-3 g-lg-4">
+              <Row xs={6} sm={6} md={4} lg={3} className="g-2 g-md-3 g-lg-4">
                 {filteredResults.map((item, index) => (
                   <Col key={`${item.type}-${item.id}-${index}`}>
                     <Card
@@ -183,9 +183,8 @@ function SearchPage() {
                       style={{ borderRadius: '12px', cursor: 'pointer', overflow: 'hidden' }}
                     >
                       <Card.Body className="p-2 p-md-3 p-lg-4 d-flex flex-column gap-1 gap-md-2">
-                        {/* Icon: visible on all screens except extra-small (hidden via CSS) */}
                         <div className="d-flex align-items-start">
-                          <div className="search-result-icon me-2 flex-shrink-0" style={{ marginTop: '2px' }}>
+                          <div className="search-result-icon me-2 flex-shrink-0 d-none d-sm-block" style={{ marginTop: '2px' }}>
                             <i className={`bi ${getIconForType(item.type)} fs-5 icon-responsive`} style={{ color: 'var(--brand-primary)' }}></i>
                           </div>
                           <div className="flex-grow-1 min-width-0">
@@ -203,7 +202,6 @@ function SearchPage() {
                           </div>
                         </div>
 
-                        {/* Snippet */}
                         {item.snippet && (
                           <Card.Text className="text-muted small flex-grow-1 line-clamp-2 mb-0 card-desc-responsive">
                             {stripHtml(item.snippet)}
@@ -283,17 +281,33 @@ function SearchPage() {
           min-width: 0;
         }
 
-        /* Hide icon only on extra-small screens (≤575.98px) */
-        @media (max-width: 575.98px) {
-          .search-result-icon {
-            display: none !important;
-          }
-        }
-
-        /* Responsive typography and spacing */
+        /* Responsive */
         @media (max-width: 576px) {
           .card-title-responsive {
-            font-size: 0.85rem !important;
+            font-size: 0.8rem !important;
+          }
+          .card-desc-responsive {
+            font-size: 0.7rem !important;
+          }
+          .card-subtitle-responsive {
+            font-size: 0.65rem !important;
+          }
+          .icon-responsive {
+            font-size: 1rem !important;
+          }
+          .card-body {
+            padding: 0.5rem !important;
+          }
+          .badge {
+            font-size: 0.5rem !important;
+          }
+          .gap-1 {
+            gap: 0.15rem !important;
+          }
+        }
+        @media (min-width: 577px) and (max-width: 768px) {
+          .card-title-responsive {
+            font-size: 0.9rem !important;
           }
           .card-desc-responsive {
             font-size: 0.75rem !important;
@@ -302,50 +316,7 @@ function SearchPage() {
             font-size: 0.7rem !important;
           }
           .icon-responsive {
-            font-size: 1.1rem !important;
-          }
-          .card-body {
-            padding: 0.75rem !important;
-          }
-          .search-result-icon {
-            margin-right: 0.5rem !important;
-          }
-        }
-        @media (max-width: 400px) {
-          .card-title-responsive {
-            font-size: 0.75rem !important;
-          }
-          .card-desc-responsive {
-            font-size: 0.65rem !important;
-          }
-          .card-subtitle-responsive {
-            font-size: 0.6rem !important;
-          }
-          .icon-responsive {
-            font-size: 0.9rem !important;
-          }
-          .card-body {
-            padding: 0.5rem !important;
-          }
-          .gap-1 {
-            gap: 0.25rem !important;
-          }
-          .badge {
-            font-size: 0.5rem !important;
-          }
-        }
-        @media (min-width: 577px) and (max-width: 768px) {
-          .card-title-responsive {
-            font-size: 0.95rem !important;
-          }
-          .card-desc-responsive {
-            font-size: 0.8rem !important;
-          }
-          .card-subtitle-responsive {
-            font-size: 0.75rem !important;
-          }
-          .icon-responsive {
-            font-size: 1.25rem !important;
+            font-size: 1.15rem !important;
           }
         }
       `}</style>
